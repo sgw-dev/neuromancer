@@ -5,7 +5,7 @@ using UnityEngine;
 public class HexTile : MonoBehaviour
 {
     public HexTile[] nexts = new HexTile[6];
-    public Vector3 position;
+    Vector3 position;
 
     public void Start()
     {

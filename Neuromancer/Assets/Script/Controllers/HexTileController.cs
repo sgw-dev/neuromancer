@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class HexTileController : MonoBehaviour
 {
-    PointerController pointer;
     public HexTile hexPrefab;
+    [SerializeField] HexTile head;
 
     [SerializeField] int amountTiles;
 
@@ -23,7 +23,8 @@ public class HexTileController : MonoBehaviour
     void GenerateTiles()
     {
         Queue<HexTile> queue = new Queue<HexTile>();
-        HexTile currentHT = Instantiate(hexPrefab, transform);
+        HexTile currentHT = head;
+
         int max = amountTiles - 1;
         while(max > 0)
         {
@@ -46,7 +47,7 @@ public class HexTileController : MonoBehaviour
 
         ht.InsertNext(side, newHT);
         int add = (side + 1) % 6;
-        int minus = (side - 1) % 6;
+        int minus = side - 1;
         if (minus == -1)
             minus = 5;
 
@@ -59,22 +60,26 @@ public class HexTileController : MonoBehaviour
         return newHT;
     }
 
-    public Vector3 FindClosestHex(Vector3 point)
+    public HexTile FindClosestHex(Vector3 point, HexTile ht)
     {
-        Vector3 closest = Vector3.zero;
-        float disClosest = Vector3.Distance(point, closest);
+        HexTile rtn = ht;
+        float minMag = (ht.Position - point).sqrMagnitude;
 
         for (int i = 0; i < 6; i++)
         {
-            float dis = Vector3.Distance(point, adjacentHexes[i]);
-            if (dis < disClosest)
+            HexTile temp = ht.nexts[i];
+            if (temp == null)
+                continue;
+
+            float mag = (temp.Position - point).sqrMagnitude;
+            if (mag < minMag)
             {
-                closest = adjacentHexes[i];
-                disClosest = dis;
+                rtn = temp;
+                minMag = mag;
             }
         }
 
-        return closest;
+        return rtn;
     }
 
     public int FindHexDistance(Vector3 a, Vector3 b)
@@ -116,6 +121,12 @@ public class HexTileController : MonoBehaviour
     public Vector3[] CloseHexes
     {
         get { return adjacentHexes; }
+    }
+
+    public HexTile Head
+    {
+        get { return head; }
+        set { head = value; }
     }
 
     void CreateHexPositions()

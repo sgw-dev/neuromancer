@@ -4,21 +4,21 @@ using UnityEngine;
 
 public class PointerController : MonoBehaviour
 {
-    Vector3 position;
-
-    public HexTileController hexTile;
+    public HexTileController hexTileController;
+    HexTile hexTile;
 
     public int testCount;
 
     public void Start()
     {
-        position = transform.position;
+        hexTile = hexTileController.Head;
+        transform.position = hexTile.Position;
     }
 
     public void Update()
     {
         MoveHighlight();
-        testCount = hexTile.FindHexDistance(Vector3.zero, position);
+        testCount = hexTileController.FindHexDistance(Vector3.zero, hexTile.Position);
     }
 
     public void MoveHighlight()
@@ -26,13 +26,19 @@ public class PointerController : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.z = 0;
 
-        position += hexTile.FindClosestHex(mousePos - position);
-        transform.position = position;
+        hexTile = hexTileController.FindClosestHex(mousePos, hexTile);
+        transform.position = hexTile.Position;
     }
 
     public Vector3 Position
     {
-        get { return position; }
-        set { position = value; }
+        get { return hexTile.Position; }
+        set { hexTile.Position = value; }
+    }
+
+    public HexTile HexTile
+    {
+        get { return hexTile; }
+        set { hexTile = value; }
     }
 }
