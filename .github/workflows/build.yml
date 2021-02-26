@@ -27,12 +27,12 @@ jobs:
       - name: Load Library
         uses: actions/cache@v1.1.0
         with:
-          path: neuromancer/Library
+          path: Neuromancer/Library
           key: Library
       - name: Build project
         uses: webbertakken/unity-builder@v1.2
         with:
-          projectPath: "neuromancer"
+          projectPath: "Neuromancer"
           unityVersion: 2019.4.11f1
           targetPlatform: ${{ matrix.targetPlatform }}
       - name: Upload Artifact
