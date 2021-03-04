@@ -1,5 +1,5 @@
 ﻿namespace TurnBasedSystem {
-    public enum Class {
+    public enum CharacterClass {
         MELEE,
         RANGED,
         HACKER,

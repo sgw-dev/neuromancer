@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f6f5086cf9b33aa46a29239c51984e5e, type: 3}
-  m_Name: CharacterTestStats
+  m_Name: PSYONIC
   m_EditorClassIdentifier: 
-  health: 250
-  energy: 150
-  speed: 50
-  character_class: 0
+  health: 30
+  energy: 100
+  speed: 3
+  character_class: 3

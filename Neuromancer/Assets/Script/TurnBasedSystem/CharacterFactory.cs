@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using UnityEditor;
+//using UnityEditor;
 using UnityEngine;
 
 namespace TurnBasedSystem
@@ -9,6 +9,7 @@ namespace TurnBasedSystem
 	public class CharacterFactory
 	{
 		static CharacterFactory factory;
+		Dictionary<CharacterClass,Stat> definedCharacters;
 
 		public static CharacterFactory getInstance() {
 			if(factory == null) {
@@ -19,29 +20,39 @@ namespace TurnBasedSystem
 
 		CharacterFactory() 
 		{
-			//load templates into a pool, maybe a Dictionary
+			definedCharacters = LoadCharacterStats();
 		}
 
-		public Character CreateCharacter(Class characterclass)
+		public Character CreateCharacter(CharacterClass characterclass)
 		{
-			//should have the factory load templates
-
-			//this is temp for testing
-			return new Character("NONAME",characterclass,new Stat{health=0,speed=0,energy=0});
+			Stat stats;
+			definedCharacters.TryGetValue(characterclass,out stats);
+			return new Character("",characterclass,stats);
 		}
 
-		
-		//helper to mimic attached scriptable objects
-        //https://answers.unity.com/questions/1425758/how-can-i-find-all-instances-of-a-scriptable-objec.html
-        T[] GetAllInstances<T>() where T : ScriptableObject {
-            string[] guids = AssetDatabase.FindAssets("t:"+ typeof(T).Name);  //FindAssets uses tags check documentation for more info
-            T[] a = new T[guids.Length];
-            for(int i =0;i<guids.Length;i++) {
-                string path = AssetDatabase.GUIDToAssetPath(guids[i]);
-                a[i] = AssetDatabase.LoadAssetAtPath<T>(path);
-            }
-            return a;
-        }
+		//public T[] GetAllInstances<T>() where T:ScriptableObject {
+		Dictionary<CharacterClass,Stat> LoadCharacterStats() {
+			definedCharacters = new Dictionary<CharacterClass, Stat>();
+			PredefinedTestCharacterStats[] so =  Resources.LoadAll<PredefinedTestCharacterStats>("Characters");
+			foreach(PredefinedTestCharacterStats c in so) {
+				
+				definedCharacters.Add((CharacterClass)c.character_class,
+                    new Stat{
+						health=c.health,
+						speed=c.speed,
+						energy=c.energy
+					});
+				// Debug.Log(c.character_class + "\n" +
+				//           c.name            + "\n" +
+				// 		  c.speed           + "\n" +
+				// 		  c.health          + "\n" +
+				// 		  c.energy          + "\n" 
+				// );
+			}
+			return definedCharacters;
+		}
+
+
 		
 	}
 }

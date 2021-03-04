@@ -7,11 +7,12 @@ namespace TurnBasedSystem {
     {
 
         public string   name;
-        public int      currency;
         public bool     ReadyToEndTurn;
         
         //Characters and items?
         public Dictionary<string,string>    items;
+        //one character name per character,
+        //if using more than one class create a name like MELEE1,2..
         public Dictionary<string,Character> characters;
         
         //Actions 
@@ -22,7 +23,6 @@ namespace TurnBasedSystem {
         {
             
             name       = n;
-            currency   = 0;
             items      = new Dictionary<string,string>();
             characters = new Dictionary<string,Character>();
             

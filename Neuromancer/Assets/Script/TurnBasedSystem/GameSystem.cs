@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,12 +8,10 @@ namespace TurnBasedSystem {
         int            turn;        //indicates the round
         List<Player>   players;     //set of players
         
-        //should have a some pattern here 
-        //only need to know that it is a template, not what kind
+        //ScriptableObject Template
         public PredefinedTestCharacterStats char_stat_loader;
 
-        List<Action> combinedActionsSet;
-        
+        List<Action>    combinedActionsSet;
         List<Character> character_pool;
 
 
@@ -23,7 +21,7 @@ namespace TurnBasedSystem {
         public GameSystem(params Player[] all)     
         {
 
-            turn=0;
+            turn = 0;
             players = new List<Player>();
 
             for (int i = 0 ; i < all.Length; i++) 
@@ -32,32 +30,21 @@ namespace TurnBasedSystem {
             }
 
 
-            ForcePlayersReady();
-            CreatePlayersActions();
+            //ForcePlayersReady();
+            //CreatePlayersActions();//for turn 1
+
         }
 
-
-        /*
-         * Call on game initialiation to read templates
-         * and create characte pools
-         */
-        public Character CreateCharacter(string charname,PredefinedTestCharacterStats template)
+        public void AssignPlayerCharacters(Player p, params CharacterClass[] classes)
         {
-            Character c = CharacterFactory.getInstance().CreateCharacter((Class)template.character_class);
-            c.stats = new Stat{
-                health = template.health,
-                energy = template.energy,
-                speed = template.speed
-            };
-            c.name=charname;
-            return c;
-        }
-
-        public void AssignPlayerCharacters(Player p, params Character[] chars)
-        {
-            foreach(Character c in chars){
-                p.characters.Add(c.name,c);
+            //create classes.length characters for player p
+            foreach(CharacterClass c in classes){
+                p.characters.Add(
+                        c.ToString(),
+                        CharacterFactory.getInstance().CreateCharacter(c)
+                    );
             }
+
         }
 
         /*
@@ -82,8 +69,7 @@ namespace TurnBasedSystem {
             CombineActions(players.ToArray());
             //execute the moves
             ExecuteActions();
-            //mark all players as a new turn begins
-
+            
             //end
             TurnCleanUp();
 
@@ -136,6 +122,7 @@ namespace TurnBasedSystem {
             return players.Count;
         }
 
+    
         public void CombineActions(params Player[] players) 
         {
             
