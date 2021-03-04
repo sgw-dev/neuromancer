@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace TurnBasedSystem {
-    public class Character : IComparable,ICloneable {
+    public class Character : IComparable {
         public string name;
         public Stat stats;
         public CharacterClass characterclass;
@@ -17,10 +17,6 @@ namespace TurnBasedSystem {
             stats = charstats;
             characterclass = cclass;
             ActionTakenThisTurn=false;
-        }
-
-        public object Clone() {
-            return new Character(name,characterclass,stats);
         }
 
         public int CompareTo(object obj) 
