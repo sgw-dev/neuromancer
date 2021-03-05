@@ -14,53 +14,30 @@ public class HexTileController : MonoBehaviour
     float halfY;
     Vector3[] adjacentHexes;
 
-    public void Start()
+    public void Awake()
     {
         CreateHexPositions();
         GenerateTiles();
     }
 
-    void GenerateTiles()
+    public HexTile FindHex(Vector3 position)
     {
-        Queue<HexTile> queue = new Queue<HexTile>();
-        HexTile currentHT = head;
+        return FindHex(position, head);
+    }
 
-        int max = amountTiles - 1;
-        while(max > 0)
+    public HexTile FindHex(Vector3 pos, HexTile ht)
+    {
+        HexTile previous = ht;
+        HexTile rtn = FindNextHex(pos, ht);
+        while (rtn != previous)
         {
-            for (int i = 0; i < currentHT.nexts.Length && max > 0; i++)
-            {
-                if (currentHT.nexts[i] == null)
-                {
-                    queue.Enqueue(AddHexTile(currentHT, i));
-                    max--;
-                }
-            }
-            currentHT = queue.Dequeue();
+            previous = rtn;
+            rtn = FindNextHex(pos, rtn);
         }
+        return rtn;
     }
 
-    public HexTile AddHexTile(HexTile ht, int side)
-    {
-        HexTile newHT = Instantiate(hexPrefab, transform);
-        newHT.Position = ht.Position + adjacentHexes[side];
-
-        ht.InsertNext(side, newHT);
-        int add = (side + 1) % 6;
-        int minus = side - 1;
-        if (minus == -1)
-            minus = 5;
-
-        if(ht.nexts[add] != null)
-            ht.nexts[add].InsertNext(minus, newHT);
-
-        if(ht.nexts[minus] != null)
-            ht.nexts[minus].InsertNext(add, newHT);
-
-        return newHT;
-    }
-
-    public HexTile FindClosestHex(Vector3 point, HexTile ht)
+    HexTile FindNextHex(Vector3 point, HexTile ht)
     {
         HexTile rtn = ht;
         float minMag = (ht.Position - point).sqrMagnitude;
@@ -101,6 +78,46 @@ public class HexTileController : MonoBehaviour
         }
 
         return hexCount;
+    }
+
+    void GenerateTiles()
+    {
+        Queue<HexTile> queue = new Queue<HexTile>();
+        HexTile currentHT = head;
+
+        int max = amountTiles - 1;
+        while (max > 0)
+        {
+            for (int i = 0; i < currentHT.nexts.Length && max > 0; i++)
+            {
+                if (currentHT.nexts[i] == null)
+                {
+                    queue.Enqueue(AddHexTile(currentHT, i));
+                    max--;
+                }
+            }
+            currentHT = queue.Dequeue();
+        }
+    }
+
+    HexTile AddHexTile(HexTile ht, int side)
+    {
+        HexTile newHT = Instantiate(hexPrefab, transform);
+        newHT.Position = ht.Position + adjacentHexes[side];
+
+        ht.InsertNext(side, newHT);
+        int add = (side + 1) % 6;
+        int minus = side - 1;
+        if (minus == -1)
+            minus = 5;
+
+        if (ht.nexts[add] != null)
+            ht.nexts[add].InsertNext(minus, newHT);
+
+        if (ht.nexts[minus] != null)
+            ht.nexts[minus].InsertNext(add, newHT);
+
+        return newHT;
     }
 
     public float CellSize
