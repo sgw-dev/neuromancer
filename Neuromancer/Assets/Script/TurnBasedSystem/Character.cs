@@ -21,7 +21,14 @@ namespace TurnBasedSystem {
 
         public int CompareTo(object obj) 
         {
+            if(!(obj is Character )){
+                throw new Exception(obj+" is not comparable to Character");
+            }
             return ((Character)obj).stats.speed-stats.speed;
+        }
+
+        public void GetListOfActions() {
+            //
         }
     }
 }
