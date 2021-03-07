@@ -38,7 +38,7 @@ public class MoveActionFactory : ActionFactory
             */
         
         //for now give each Character one move and one attack
-        actions.Add(new AttackAction(c,1,AttackType.SINGLE));
+        // actions.Add(new AttackAction(c,1,AttackType.SINGLE));
         actions.Add(new MoveAction(c,2));
 
         return actions;

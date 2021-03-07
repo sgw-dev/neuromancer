@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-namespace TurnBasedSystem {
+using TurnBasedSystem;
     public class Character : IComparable {
+        public Transform gameCharacter;//need to get transform...etc
         public string name;
         public Stat stats;
         public CharacterClass characterclass;
@@ -13,7 +13,7 @@ namespace TurnBasedSystem {
         
         public Character(string name,CharacterClass cclass,Stat charstats) 
         {
-            this.name = name;
+            name = name;
             stats = charstats;
             characterclass = cclass;
             ActionTakenThisTurn=false;
@@ -29,6 +29,7 @@ namespace TurnBasedSystem {
 
         public void GetListOfActions() {
             //
+            GameObject p = gameCharacter.gameObject;
         }
+
     }
-}

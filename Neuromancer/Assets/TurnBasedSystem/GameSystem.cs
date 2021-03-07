@@ -93,11 +93,18 @@ namespace TurnBasedSystem {
             return isEveryoneReady;
         }
 
-        void TurnCleanUp() {
+        void TurnCleanUp() 
+        {
+
             //mark players as ready
             ForcePlayersReady();
-            //populate next turns moves, and remove other
-            CreatePlayersActions();
+            //clear players list of possible actions
+            //clear actions about to be taken(already executed)
+            for(int i = 0 ; i < players.Count; i++ ){
+                players[i].possible_character_actions.Clear();
+                players[i].inprogress_character_actions.Clear();
+            }
+            
         }
 
         void ForcePlayersReady() {
@@ -109,20 +116,27 @@ namespace TurnBasedSystem {
 
         }
 
-        void CreatePlayersActions() {
+        //should rely on outside 
+        // void CreatePlayersActions() {
 
-            //come back to this
+        //     //come back to this
             
-            // for (int i = 0 ; i < PlayerCount() ; i++ ) 
-            // {
-            //     //clear their list
-            //     players[i].possible_character_actions.Clear();
-            //     //get new list
-            //     players[i].possible_character_actions 
-            //         = ActionManager.GetAttackFactory().GetPlayerActions(players[i]);
-            // }
+        //     for (int i = 0 ; i < PlayerCount() ; i++ ) 
+        //     {
+        //         //clear their list
+        //         players[i].possible_character_actions.Clear();
+        //         //get new list
+        //         // players[i].possible_character_actions 
+        //         //     = ActionManager.GetAttackFactory().GetPlayerActions(players[i]);
+
+        //         foreach(Character kv in players[i].characters.Values) {
+        //             players[i].possible_character_actions.AddRange(
+        //                 ActionManager.GetAttackFactory().GetActions(kv)
+        //             );
+        //         }
+        //     }
             
-        }
+        // }
 
         public int PlayerCount() {
             return players.Count;
@@ -164,9 +178,9 @@ namespace TurnBasedSystem {
 
 
         #if UNITY_EDITOR
-            public void TEST_CreatePlayersActions() {
-                CreatePlayersActions();
-            }
+            // public void TEST_CreatePlayersActions() {
+            //     CreatePlayersActions();
+            // }
 
             public List<Action> TEST_combinedActionsSet() 
             {

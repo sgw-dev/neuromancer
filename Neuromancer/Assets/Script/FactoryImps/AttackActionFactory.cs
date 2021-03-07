@@ -26,7 +26,7 @@ public class AttackActionFactory : ActionFactory
             //check character class
             //check surrounding tiles that can be attacked
             //create actions
-
+        possibleActions.Add(new AttackAction(c,2,AttackType.SINGLE,10));
         
         return possibleActions;
     }
