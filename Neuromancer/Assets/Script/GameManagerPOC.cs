@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
 
-public class POC : MonoBehaviour
+public class GameManagerPOC : MonoBehaviour
 {
     public GameSystem gameSystem;
     void Start()
