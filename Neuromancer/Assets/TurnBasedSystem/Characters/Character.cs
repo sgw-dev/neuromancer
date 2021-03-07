@@ -13,7 +13,7 @@ using TurnBasedSystem;
         
         public Character(string name,CharacterClass cclass,Stat charstats) 
         {
-            name = name;
+            this.name = name;
             stats = charstats;
             characterclass = cclass;
             ActionTakenThisTurn=false;
@@ -28,8 +28,7 @@ using TurnBasedSystem;
         }
 
         public void GetListOfActions() {
-            //
-            GameObject p = gameCharacter.gameObject;
+            //GameObject p = gameCharacter.gameObject;
         }
 
     }

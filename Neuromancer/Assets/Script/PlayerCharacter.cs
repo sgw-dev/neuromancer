@@ -8,14 +8,8 @@ public class PlayerCharacter : MonoBehaviour
    
     public Character character;
     
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        
+        //probably animate characters here
     }
 }

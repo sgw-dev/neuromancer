@@ -27,7 +27,7 @@ namespace TurnBasedSystem
 		{
 			Stat stats;
 			definedCharacters.TryGetValue(characterclass,out stats);
-			return new Character("",characterclass,stats);
+			return new Character(characterclass.ToString(),characterclass,stats);
 		}
 
 		//public T[] GetAllInstances<T>() where T:ScriptableObject {
@@ -42,12 +42,6 @@ namespace TurnBasedSystem
 						speed=c.speed,
 						energy=c.energy
 					});
-				// Debug.Log(c.character_class + "\n" +
-				//           c.name            + "\n" +
-				// 		  c.speed           + "\n" +
-				// 		  c.health          + "\n" +
-				// 		  c.energy          + "\n" 
-				// );
 			}
 			return definedCharacters;
 		}

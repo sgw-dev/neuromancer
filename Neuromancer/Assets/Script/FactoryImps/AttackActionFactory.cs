@@ -8,6 +8,7 @@ public class AttackActionFactory : ActionFactory
 
     static AttackActionFactory factory;
 
+
     public static AttackActionFactory GetInstance()
     {
         if(factory is null) {
@@ -26,8 +27,20 @@ public class AttackActionFactory : ActionFactory
             //check character class
             //check surrounding tiles that can be attacked
             //create actions
+
+        //still needs to change
         possibleActions.Add(new AttackAction(c,2,AttackType.SINGLE,10));
         
         return possibleActions;
     }
+
+    
+    AttackActionFactory()
+    {
+        if(factory==null) 
+        {
+            factory=new AttackActionFactory();
+        }
+    }
+
 }

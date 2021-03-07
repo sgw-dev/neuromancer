@@ -48,7 +48,6 @@ namespace TurnBasedSystem {
                         CharacterFactory.getInstance().CreateCharacter(c)
                     );
             }
-
         }
 
         /*
@@ -175,7 +174,10 @@ namespace TurnBasedSystem {
 
         }
 
-
+        public List<Player> Players() 
+        {
+                return players;
+        }
 
         #if UNITY_EDITOR
             // public void TEST_CreatePlayersActions() {
@@ -192,9 +194,7 @@ namespace TurnBasedSystem {
                 return character_pool;
             }
 
-            public List<Player> TEST_players() {
-                return players;
-            }
+            
         #endif
 
     }
