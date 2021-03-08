@@ -69,18 +69,18 @@ public class GameManagerPOC : MonoBehaviour
 
     //filler code for now
     public void PutCharactersOnBoard() {
-        // GameObject tc = GameObject.Find("TileController");
-        // foreach(Player p in gameSystem.Players())
-        // {
-        //     foreach(Character c in p.characters.Values)
-        //     {
-        //         Debug.Log(c.name);
-        //         //game is ready, show characters
-        //         SpriteRenderer r = c.gameCharacter.gameObject.GetComponent<SpriteRenderer>();
-        //         r.enabled = true;
-        //     }
-        // }
-        // GameObject.Find("Start").SetActive(false);
+        GameObject tc = GameObject.Find("TileController");
+        foreach(Player p in gameSystem.Players())
+        {
+            foreach(Character c in p.characters.Values)
+            {
+                Debug.Log(c.name);
+                //game is ready, show characters
+                SpriteRenderer r = c.gameCharacter.gameObject.GetComponent<SpriteRenderer>();
+                r.enabled = true;
+            }
+        }
+        GameObject.Find("Start").SetActive(false);
     }
 
     // public void GetActions() {
