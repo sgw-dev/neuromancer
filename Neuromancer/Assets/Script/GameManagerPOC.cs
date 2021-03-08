@@ -7,12 +7,18 @@ public class GameManagerPOC : MonoBehaviour
 {
     public GameSystem gameSystem;
 
-    //find a better way
+    [Tooltip("Put in order of the enum")]
     public Sprite[] sprites;
 
     public GameObject characterPrefab;
     
-    CharacterClass[] classes = new CharacterClass[]{CharacterClass.MELEE,CharacterClass.RANGED,CharacterClass.PSYONIC,CharacterClass.HACKER};
+    CharacterClass[] classes = 
+        new CharacterClass[] {
+                CharacterClass.MELEE,
+                CharacterClass.RANGED,
+                CharacterClass.PSYONIC,
+                CharacterClass.HACKER
+            };
     
 
     //creates players,
@@ -28,8 +34,6 @@ public class GameManagerPOC : MonoBehaviour
         gameSystem.AssignPlayerCharacters(player1,classes);
         gameSystem.AssignPlayerCharacters(player2,classes);
 
-        Debug.Log(gameSystem.Players()[0].name);
-
         Material sprites_default = new Material(Shader.Find("Sprites/Default"));;
         //create the actual gameobject
         for(int i = 0 ; i < gameSystem.Players().Count; i++) 
@@ -37,7 +41,7 @@ public class GameManagerPOC : MonoBehaviour
             Player p = gameSystem.Players()[i];
             foreach(Character c in p.characters.Values)
             {
-                
+                //rename characters
                 c.name=p.name+"_"+c.name;
 
                 GameObject tmp = new GameObject(p.name+" "+c.characterclass.ToString());
@@ -49,37 +53,36 @@ public class GameManagerPOC : MonoBehaviour
                 SpriteRenderer renderer = tmp.AddComponent<SpriteRenderer>();
                 renderer.sprite=sprites[(int)c.characterclass];
                 renderer.material = sprites_default;
-                
                 //hide until ready
                 renderer.enabled = false;
                 
             }
-
         }
-
     }
 
-
     //call from button
-    public void EndRound() {
+    public void EndRound() 
+    {
         gameSystem.EndTurn();
     }
 
-
-
     //filler code for now
-    public void PutCharactersOnBoard() {
+    public void PutCharactersOnBoard()
+    {
+        
         GameObject tc = GameObject.Find("TileController");
+        
         foreach(Player p in gameSystem.Players())
         {
             foreach(Character c in p.characters.Values)
             {
-                Debug.Log(c.name);
+                //Debug.Log(c.name);
                 //game is ready, show characters
                 SpriteRenderer r = c.gameCharacter.gameObject.GetComponent<SpriteRenderer>();
                 r.enabled = true;
             }
         }
+
         GameObject.Find("Start").SetActive(false);
     }
 
