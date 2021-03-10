@@ -12,5 +12,7 @@ public class HexTest : MonoBehaviour
         hexTileController = GameObject.FindGameObjectWithTag("HexController").GetComponent<HexTileController>();
         hexTile = hexTileController.FindHex(transform.position);
         transform.position = hexTile.Position;
+
+        hexTile.SetObject(gameObject);
     }
 }
