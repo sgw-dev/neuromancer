@@ -269,6 +269,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 685935226}
   pc: {fileID: 1465417649}
+  htc: {fileID: 1015876648}
 --- !u!1 &685935226
 GameObject:
   m_ObjectHideFlags: 0

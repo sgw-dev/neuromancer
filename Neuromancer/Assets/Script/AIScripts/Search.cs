@@ -30,14 +30,18 @@ public class Search
             int action = 0;
             foreach(HexTile nextState in state.nexts)
             {
-                List<int> newActions = new List<int>();
-                foreach(int i in actions)
+                if(nextState != null)
                 {
-                    newActions.Add(i);
+                    List<int> newActions = new List<int>();
+                    foreach (int i in actions)
+                    {
+                        newActions.Add(i);
+                    }
+                    newActions.Add(action);
+                    float cost = htc.FindHexDistance(nextState.Position, end.Position);
+                    fringe.Push((nextState, newActions), cost);
                 }
-                newActions.Add(action);
-                float cost = htc.FindHexDistance(nextState.Position, end.Position);
-                fringe.Push((nextState, newActions), cost);
+                
                 action++;
             }
         }
