@@ -80,6 +80,11 @@ public class HexTileController : MonoBehaviour
         return hexCount;
     }
 
+    public HexTile[] FindRadius(HexTile ht, int radius)
+    {
+        return null;
+    }
+
     void GenerateTiles()
     {
         Queue<HexTile> queue = new Queue<HexTile>();
