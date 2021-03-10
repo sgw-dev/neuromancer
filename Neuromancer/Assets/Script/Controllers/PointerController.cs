@@ -12,6 +12,7 @@ public class PointerController : MonoBehaviour
     public void Start()
     {
         hexTile = hexTileController.FindHex(transform.position);
+        hexTile.setHighlight(true);
         transform.position = hexTile.Position;
         MoveHighlight();
     }
@@ -27,7 +28,9 @@ public class PointerController : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.z = 0;
 
+        hexTile.setHighlight(false);
         hexTile = hexTileController.FindHex(mousePos, hexTile);
+        hexTile.setHighlight(true);
         transform.position = hexTile.Position;
     }
 

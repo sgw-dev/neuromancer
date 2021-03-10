@@ -6,9 +6,14 @@ public class HexTile : MonoBehaviour
 {
     public HexTile[] nexts = new HexTile[6];
     Vector3 position;
+    [SerializeField] GameObject highlight;
+
+    GameObject holdingObject;
+    bool isObstacle;
 
     public void Start()
     {
+        highlight.SetActive(false);
         transform.position = position;
     }
 
@@ -23,5 +28,26 @@ public class HexTile : MonoBehaviour
     {
         get { return position; }
         set { position = value; }
+    }
+
+    public GameObject HoldingObject
+    {
+        get { return holdingObject; }
+    }
+
+    public bool IsObstacle
+    {
+        get { return isObstacle; }
+    }
+
+    public void SetObject(GameObject obj, bool isObstacle = false)
+    {
+        holdingObject = obj;
+        this.isObstacle = isObstacle;
+    }
+
+    public void setHighlight(bool b)
+    {
+        highlight.SetActive(b);
     }
 }
