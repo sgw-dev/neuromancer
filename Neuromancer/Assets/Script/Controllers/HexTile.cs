@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class HexTile : MonoBehaviour
+public class HexTile : MonoBehaviour , IEquatable<HexTile>
 {
     public HexTile[] nexts = new HexTile[6];
     Vector3 position;
@@ -49,5 +50,11 @@ public class HexTile : MonoBehaviour
     public void setHighlight(bool b)
     {
         highlight.SetActive(b);
+    }
+
+    //By Spencer
+    public bool Equals(HexTile other)
+    {
+        return Position.Equals(other.position);
     }
 }
