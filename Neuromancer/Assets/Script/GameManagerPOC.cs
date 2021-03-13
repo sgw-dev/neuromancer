@@ -29,13 +29,18 @@ public class GameManagerPOC : MonoBehaviour
     {
         Player player1 = new Player("PLAYER_1");
         Player player2 = new Player("PLAYER_2");
+
+        //create the game
         gameSystem = new GameSystem(player1, player2);
         
+        //make sure all players get their characters, for >2 make a loop
         gameSystem.AssignPlayerCharacters(player1,classes);
         gameSystem.AssignPlayerCharacters(player2,classes);
 
+
         Material sprites_default = new Material(Shader.Find("Sprites/Default"));;
-        //create the actual gameobject
+        
+        //create the actual sprites and tie the scripts to gameobjects
         for(int i = 0 ; i < gameSystem.Players().Count; i++) 
         {
             Player p = gameSystem.Players()[i];
@@ -43,16 +48,20 @@ public class GameManagerPOC : MonoBehaviour
             {
                 //rename characters
                 c.name=p.name+"_"+c.name;
-
                 GameObject tmp = new GameObject(p.name+" "+c.characterclass.ToString());
+
                 //add the MonoBehaviour OR ELSE! 
                 PlayerCharacter ctmp = tmp.AddComponent<PlayerCharacter>();
+
+                //reference to mono and script
                 ctmp.character = c;//dont forget 
                 c.gameCharacter = tmp.transform;
-                //this part is fine
+
+                //put the sprite onto
                 SpriteRenderer renderer = tmp.AddComponent<SpriteRenderer>();
                 renderer.sprite=sprites[(int)c.characterclass];
                 renderer.material = sprites_default;
+                
                 //hide until ready
                 renderer.enabled = false;
                 
@@ -74,7 +83,6 @@ public class GameManagerPOC : MonoBehaviour
     //filler code for now
     public void PutCharactersOnBoard()
     {
-        
         GameObject tc = GameObject.Find("TileController");
         
         foreach(Player p in gameSystem.Players())
@@ -87,7 +95,6 @@ public class GameManagerPOC : MonoBehaviour
                 r.enabled = true;
             }
         }
-
         GameObject.Find("Start").SetActive(false);
     }
 
