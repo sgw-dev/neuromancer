@@ -63,7 +63,12 @@ public class GameManagerPOC : MonoBehaviour
     //call from button
     public void EndRound() 
     {
-        gameSystem.EndTurn();
+        for( int i = 0 ; i < gameSystem.PlayerCount() ; i++ )
+        {
+            //should rotate through all players
+            gameSystem.EndTurn(gameSystem.Players()[0]);
+        }
+
     }
 
     //filler code for now

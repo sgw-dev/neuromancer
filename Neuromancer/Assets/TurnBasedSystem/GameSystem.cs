@@ -5,8 +5,8 @@ using UnityEngine;
 namespace TurnBasedSystem {
     public class GameSystem {
 
-        int            turn;        //indicates the round
-        List<Player>   players;     //set of players
+        int             turn;        //indicates the round
+        Queue<Player>   players;     //set of players
         
         //ScriptableObject Template
         public PredefinedTestCharacterStats char_stat_loader;
@@ -23,11 +23,11 @@ namespace TurnBasedSystem {
         {
 
             turn = 0;
-            players = new List<Player>();
+            players = new Queue<Player>();
 
             for (int i = 0 ; i < all.Length; i++) 
             {
-                players.Add(all[i]);
+                players.Enqueue(all[i]);
             }
 
 
@@ -60,123 +60,110 @@ namespace TurnBasedSystem {
             }
         }
 
+        public string WhosTurn() 
+        {
+            return players.Peek().name;
+        }
 
-        public void EndTurn() {
+        public void EndTurn(Player p) {
 
-            //check if all players are ready for the turns to end
-            if (!allReady()) 
+            //Check if the player trying to end, is actually whos turn it is
+            if (!players.Peek().Equals(p)) 
             {
+                Debug.Log(p.name+" can't end " + players.Peek().name +"'s turn");
                 return;
             }
+
+            //get player reference
+            Player endingturn = players.Dequeue();
+
             //combine all players moves in order to determine playout
-            CombineActions(players.ToArray());
+            //CombineActions(players.ToArray());
+
             //execute the moves
-            ExecuteActions();
+            //ExecuteActions();
             
             //end
-            TurnCleanUp();
-
+            TurnCleanUp();//does nothing right now
+            
+            //
             turn++;
+
+            //add player back to queue
+            players.Enqueue(endingturn);
+
         }
 
 
-        bool allReady() {
-            
-            bool isEveryoneReady = true;
-            
-            foreach(Player p in players)
-            {
-                isEveryoneReady &= p.ReadyToEndTurn;
-            }
-            
-            return isEveryoneReady;
-        }
+        // bool allReady() {
+        //     bool isEveryoneReady = true;            
+        //     foreach(Player p in players) {
+        //         isEveryoneReady &= p.ReadyToEndTurn;
+        //     }
+        //     return isEveryoneReady;
+        // }
 
         void TurnCleanUp() 
         {
 
-            //mark players as ready
-            ForcePlayersReady();
-            //clear players list of possible actions
-            //clear actions about to be taken(already executed)
-            for(int i = 0 ; i < players.Count; i++ ){
-                players[i].possible_character_actions.Clear();
-                players[i].inprogress_character_actions.Clear();
-            }
+            // //mark players as ready
+            // ForcePlayersReady();
+            // //clear players list of possible actions
+            // //clear actions about to be taken(already executed)
+            // for(int i = 0 ; i < players.Count; i++ ){
+            //     players[i].possible_character_actions.Clear();
+            //     players[i].inprogress_character_actions.Clear();
+            // }
             
         }
 
-        void ForcePlayersReady() {
-
-            for (int i = 0 ; i < PlayerCount() ; i++ ) 
-            {
-                players[i].TurnReset();
-            }
-
-        }
-
-        //should rely on outside 
-        // void CreatePlayersActions() {
-
-        //     //come back to this
-            
-        //     for (int i = 0 ; i < PlayerCount() ; i++ ) 
-        //     {
-        //         //clear their list
-        //         players[i].possible_character_actions.Clear();
-        //         //get new list
-        //         // players[i].possible_character_actions 
-        //         //     = ActionManager.GetAttackFactory().GetPlayerActions(players[i]);
-
-        //         foreach(Character kv in players[i].characters.Values) {
-        //             players[i].possible_character_actions.AddRange(
-        //                 ActionManager.GetAttackFactory().GetActions(kv)
-        //             );
-        //         }
+        // void ForcePlayersReady() {
+        //     for (int i = 0 ; i < PlayerCount() ; i++ )  {
+        //         players[i].TurnReset();
         //     }
-            
         // }
+
 
         public int PlayerCount() {
             return players.Count;
         }
 
     
-        public void CombineActions(params Player[] players) 
-        {
-            
-            combinedActionsSet = new List<Action>();
-            
-            foreach(Player p in players)
-            {
-                combinedActionsSet.AddRange(p.inprogress_character_actions);
-            }
+        // public void CombineActions(params Player[] players) 
+        // {
 
-            //compare based on character speed, see compare to in character class
-            combinedActionsSet.Sort((a1,a2) => 
-                    a1.TakenBy().CompareTo(a2.TakenBy())
-            );
+        //     combinedActionsSet = new List<Action>();
+            
+        //     foreach(Player p in players)
+        //     {
+        //         combinedActionsSet.AddRange(p.inprogress_character_actions);
+        //     }
 
-        }
+        //     //compare based on character speed, see compare to in character class
+        //     combinedActionsSet.Sort((a1,a2) => 
+        //             a1.TakenBy().CompareTo(a2.TakenBy())
+        //     );
+
+        // }
 
         /*
          * Calls action interface to execute actions,
          * Each action should know "how" each action
          * is to be executed based on class
          */
-        void ExecuteActions()
-        {
+        // void ExecuteActions()
+        // {
 
-            foreach(Action a in combinedActionsSet) 
-            {
-                a.Execute();
-            }
+        //     foreach(Action a in combinedActionsSet) 
+        //     {
+        //         a.Execute();
+        //     }
 
-        }
+        // }
 
         public List<Player> Players() 
         {
-                return players;
+                return new List<Player>(players.ToArray());
         }
 
         #if UNITY_EDITOR
