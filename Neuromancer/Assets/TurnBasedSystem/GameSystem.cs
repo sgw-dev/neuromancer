@@ -5,6 +5,8 @@ using UnityEngine;
 namespace TurnBasedSystem {
     public class GameSystem {
 
+        public static GameSystem currentGame; 
+
         int             turn;        //indicates the round
         Queue<Player>   players;     //set of players
         
@@ -33,7 +35,7 @@ namespace TurnBasedSystem {
 
             //ForcePlayersReady();
             //CreatePlayersActions();//for turn 1
-
+            currentGame = this;
         }
 
         /*
@@ -84,11 +86,11 @@ namespace TurnBasedSystem {
             //ExecuteActions();
             
             //end
-            TurnCleanUp();//does nothing right now
+            TurnCleanUp(endingturn);//does nothing right now
             
             //
             turn++;
-
+            Debug.Log(endingturn.name + " turn end.");
             //add player back to queue
             players.Enqueue(endingturn);
 
@@ -103,18 +105,25 @@ namespace TurnBasedSystem {
         //     return isEveryoneReady;
         // }
 
-        void TurnCleanUp() 
+        //reset some flags
+        void TurnCleanUp(Player p) 
         {
 
-            // //mark players as ready
-            // ForcePlayersReady();
-            // //clear players list of possible actions
-            // //clear actions about to be taken(already executed)
+            //mark players as ready
+            //ForcePlayersReady();
+            //clear players list of possible actions
+            //clear actions about to be taken(already executed)
             // for(int i = 0 ; i < players.Count; i++ ){
             //     players[i].possible_character_actions.Clear();
             //     players[i].inprogress_character_actions.Clear();
             // }
             
+            //reset the characters
+            foreach(Character c in p.characters.Values) 
+            {
+                c.ActionTakenThisTurn = false;
+            }
+
         }
 
         // void ForcePlayersReady() {
@@ -164,6 +173,16 @@ namespace TurnBasedSystem {
         public List<Player> Players() 
         {
                 return new List<Player>(players.ToArray());
+        }
+
+        public static GameSystem CurrentGame() 
+        {
+            if(currentGame ==null )
+            {
+                Debug.LogError("Game has not started yet.");
+            }
+
+            return currentGame;
         }
 
         #if UNITY_EDITOR

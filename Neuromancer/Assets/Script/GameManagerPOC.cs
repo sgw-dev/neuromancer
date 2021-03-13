@@ -68,7 +68,7 @@ public class GameManagerPOC : MonoBehaviour
             //should rotate through all players
             gameSystem.EndTurn(gameSystem.Players()[0]);
         }
-
+        Debug.Log("FORCED ROUND ENDED");
     }
 
     //filler code for now

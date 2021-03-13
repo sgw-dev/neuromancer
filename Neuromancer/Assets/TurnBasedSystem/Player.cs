@@ -41,6 +41,7 @@ namespace TurnBasedSystem {
         public void EndTurn() 
         {
             ReadyToEndTurn=true;
+            GameSystem.CurrentGame().EndTurn(this);
         }
 
     }
