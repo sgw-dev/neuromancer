@@ -32,10 +32,8 @@ namespace TurnBasedSystem {
                 players.Enqueue(all[i]);
             }
 
-
-            //ForcePlayersReady();
-            //CreatePlayersActions();//for turn 1
             currentGame = this;
+
         }
 
         /*
@@ -49,16 +47,6 @@ namespace TurnBasedSystem {
                         c.ToString(),
                         CharacterFactory.getInstance().CreateCharacter(c)
                     );
-            }
-        }
-
-        /*
-         * Adds an action to a players list of actions that player wishes
-         * to take for a turn.
-         */
-        public void AddCharacterAction(Action a,Player owner) {
-            if (!owner.inprogress_character_actions.Contains(a)) {
-                owner.inprogress_character_actions.Add(a);
             }
         }
 
@@ -78,45 +66,22 @@ namespace TurnBasedSystem {
 
             //get player reference
             Player endingturn = players.Dequeue();
-
-            //combine all players moves in order to determine playout
-            //CombineActions(players.ToArray());
-
-            //execute the moves
-            //ExecuteActions();
             
             //end
             TurnCleanUp(endingturn);//does nothing right now
             
-            //
+
             turn++;
             Debug.Log(endingturn.name + " turn end.");
+
             //add player back to queue
             players.Enqueue(endingturn);
 
         }
 
-
-        // bool allReady() {
-        //     bool isEveryoneReady = true;            
-        //     foreach(Player p in players) {
-        //         isEveryoneReady &= p.ReadyToEndTurn;
-        //     }
-        //     return isEveryoneReady;
-        // }
-
         //reset some flags
         void TurnCleanUp(Player p) 
         {
-
-            //mark players as ready
-            //ForcePlayersReady();
-            //clear players list of possible actions
-            //clear actions about to be taken(already executed)
-            // for(int i = 0 ; i < players.Count; i++ ){
-            //     players[i].possible_character_actions.Clear();
-            //     players[i].inprogress_character_actions.Clear();
-            // }
             
             //reset the characters
             foreach(Character c in p.characters.Values) 
@@ -126,34 +91,10 @@ namespace TurnBasedSystem {
 
         }
 
-        // void ForcePlayersReady() {
-        //     for (int i = 0 ; i < PlayerCount() ; i++ )  {
-        //         players[i].TurnReset();
-        //     }
-        // }
-
 
         public int PlayerCount() {
             return players.Count;
         }
-
-    
-        // public void CombineActions(params Player[] players) 
-        // {
-
-        //     combinedActionsSet = new List<Action>();
-            
-        //     foreach(Player p in players)
-        //     {
-        //         combinedActionsSet.AddRange(p.inprogress_character_actions);
-        //     }
-
-        //     //compare based on character speed, see compare to in character class
-        //     combinedActionsSet.Sort((a1,a2) => 
-        //             a1.TakenBy().CompareTo(a2.TakenBy())
-        //     );
-
-        // }
 
         /*
          * Calls action interface to execute actions,
