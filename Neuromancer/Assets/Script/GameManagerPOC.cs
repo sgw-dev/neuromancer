@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
@@ -51,7 +51,7 @@ public class GameManagerPOC : MonoBehaviour
                 GameObject tmp = new GameObject(p.name+" "+c.characterclass.ToString());
 
                 //add the MonoBehaviour OR ELSE! 
-                PlayerCharacter ctmp = tmp.AddComponent<PlayerCharacter>();
+                Agent ctmp = tmp.AddComponent<Agent>();
 
                 //reference to mono and script
                 ctmp.character = c;//dont forget 
@@ -98,18 +98,9 @@ public class GameManagerPOC : MonoBehaviour
         GameObject.Find("Start").SetActive(false);
     }
 
-    // public void GetActions() {
-    //     //display in the gui actions available to character selected
-    //     //get the actions from the ActionManger/fact/
-    // }
-
     // public void AddActionTo(Player p , Action a) {
     //     //put the action into the players list of actions
     //     // gameSystem.AddCharacterAction();
-    // }
-
-    // public void CreateAllActions() {
-    //     //not sure about this yet
     // }
 
 }

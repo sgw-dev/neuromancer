@@ -96,20 +96,19 @@ namespace TurnBasedSystem {
             return players.Count;
         }
 
-        /*
-         * Calls action interface to execute actions,
-         * Each action should know "how" each action
-         * is to be executed based on class
-         */
-        // void ExecuteActions()
-        // {
+        public bool ExecuteCharacterAction(Player p,Action totake)
+        {
+            //check to see if the character is owned by player
+            if(!p.characters.ContainsValue(totake.TakenBy())) {
+                Debug.LogError(p.name + " can't use " + totake.TakenBy() );
+                return false;
+            }
 
-        //     foreach(Action a in combinedActionsSet) 
-        //     {
-        //         a.Execute();
-        //     }
+            //otherwise take the action
+            totake.Execute();
 
-        // }
+            return true;
+        }
 
         public List<Player> Players() 
         {

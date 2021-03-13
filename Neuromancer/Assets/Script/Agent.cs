@@ -7,7 +7,9 @@ public class Agent : MonoBehaviour
 {
    
     public Character character;
+    public HexTile   currentlyOn;
     
+
     void Update()
     {
         //probably animate characters here
