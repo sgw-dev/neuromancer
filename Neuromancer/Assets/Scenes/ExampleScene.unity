@@ -1697,8 +1697,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1813987035}
-        m_MethodName: EndRound
+      - m_Target: {fileID: 1954906484}
+        m_MethodName: EndMyTurn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
