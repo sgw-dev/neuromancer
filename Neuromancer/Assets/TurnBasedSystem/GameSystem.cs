@@ -116,10 +116,13 @@ namespace TurnBasedSystem {
             }
 
             //otherwise take the action
-            totake.Execute();
-            totake.TakenBy().ActionTakenThisTurn = true;
-            
-            return true;
+            bool success = totake.Execute();
+            if(success)
+            {
+                totake.TakenBy().ActionTakenThisTurn = true;
+                return true;
+            }
+            return false;
         }
 
         public List<Player> Players() 

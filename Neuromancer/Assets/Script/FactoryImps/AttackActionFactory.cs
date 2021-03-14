@@ -8,6 +8,11 @@ public class AttackActionFactory : ActionFactory
 
     static AttackActionFactory factory;
 
+    //for now values[0] should be the position, and anything else after
+    public Action CreateAction(Character c, params Vector3[] values)
+    {
+        return new AttackAction(c,values[0]);//,(AttackType)values[1].x,(int)values[1].y);
+    }
 
     public static AttackActionFactory GetInstance()
     {
@@ -17,28 +22,6 @@ public class AttackActionFactory : ActionFactory
         return factory;
     }
 
-    public Action CreateAction(Character c, params Vector3[] values)
-    {
-        return null;
-    }
-
-    //options - check all actions -works for bot
-    //        - check actions given though GUI forces bot to enumerate all actions
-    public List<Action> GetActions(Character c) 
-    {
-        List<Action> possibleActions = new List<Action>();
-        //check something
-            //check character class
-            //check surrounding tiles that can be attacked
-            //create actions
-
-        //still needs to change
-        possibleActions.Add(new AttackAction(c,2,AttackType.SINGLE,10));
-        
-        return possibleActions;
-    }
-
-    
     AttackActionFactory()
     {
         if(factory==null) 

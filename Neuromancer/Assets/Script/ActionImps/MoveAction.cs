@@ -33,16 +33,17 @@ public class MoveAction : Action
         //takenby.ActionTakenThisTurn = true;
     }
 
-    void Action.Execute() 
+    bool Execute() 
     {
         if(false) {
             //check if the agent can move to the desired tile
             //is there already something there?
             //is it in the cahacters move range
             
-            return;//dont execute the move if these are true
+            return false;//dont execute the move if these are true
         }
         MoveTo(moveto);
+        return true;
     }
 
     public Character TakenBy() 
