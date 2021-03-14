@@ -7,21 +7,41 @@ using TurnBasedSystem;
 public class MoveAction : Action
 {
     Character takenby;
-    int moveto;
-    public MoveAction(Character c, int tile) 
+    Vector3 moveto;
+    HexTileController htc;
+
+    public MoveAction(Character c, Vector3 tile) 
     {
         takenby = c;
         moveto = tile;
+        htc = GameObject.Find("TileController").GetComponent<HexTileController>();
     }
 
-    public int MoveTo(int tile) 
+    public void MoveTo(Vector3 position) 
     {
-        //Code to describe how to move to a tile
-        return tile;
+        
+        //get the tile
+        HexTile tile = htc.FindHex(position);
+        //put character onto tile
+        takenby.gameCharacter.position = tile.transform.position;
+        //update the tile character refernce
+        takenby.gameCharacter.GetComponent<Agent>().currentlyOn = tile;
+        
+        //if the tile holds references update that too
+
+        //finally mark the character as actions taken
+        //takenby.ActionTakenThisTurn = true;
     }
 
     void Action.Execute() 
     {
+        if(false) {
+            //check if the agent can move to the desired tile
+            //is there already something there?
+            //is it in the cahacters move range
+            
+            return;//dont execute the move if these are true
+        }
         MoveTo(moveto);
     }
 

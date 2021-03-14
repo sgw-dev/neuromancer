@@ -17,6 +17,10 @@ public class AttackActionFactory : ActionFactory
         return factory;
     }
 
+    public Action CreateAction(Character c, params Vector3[] values)
+    {
+        return null;
+    }
 
     //options - check all actions -works for bot
     //        - check actions given though GUI forces bot to enumerate all actions

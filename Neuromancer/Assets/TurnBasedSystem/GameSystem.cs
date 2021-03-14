@@ -104,9 +104,21 @@ namespace TurnBasedSystem {
                 return false;
             }
 
+            if(!p.Equals(players.Peek())){
+                Debug.Log(p.name+"can't use "+ totake.TakenBy()+"  becuase it is not your turn!");
+                return false;
+            }
+
+            if(totake.TakenBy().ActionTakenThisTurn) 
+            {
+                Debug.Log(totake.TakenBy()+" has already taken an action!");
+                return false;
+            }
+
             //otherwise take the action
             totake.Execute();
-
+            totake.TakenBy().ActionTakenThisTurn = true;
+            
             return true;
         }
 

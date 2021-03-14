@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -37,6 +38,8 @@ public class GameManagerPOC : MonoBehaviour
         gameSystem.AssignPlayerCharacters(player1,classes);
         gameSystem.AssignPlayerCharacters(player2,classes);
 
+        //assign the player script to the human player
+        GameObject.Find("Player").GetComponent<PlayerController>().player = player1;
 
         Material sprites_default = new Material(Shader.Find("Sprites/Default"));;
         
@@ -96,6 +99,7 @@ public class GameManagerPOC : MonoBehaviour
             }
         }
         GameObject.Find("Start").SetActive(false);
+        RandomlyPlace();
     }
 
     // public void AddActionTo(Player p , Action a) {
@@ -103,4 +107,42 @@ public class GameManagerPOC : MonoBehaviour
     //     // gameSystem.AddCharacterAction();
     // }
 
+    //get rid of this 
+    public void RandomlyPlace(){
+        HexTileController htc = GameObject.Find("TileController").GetComponent<HexTileController>();
+
+        Debug.Log(htc.Head.Position);
+        // hexTileController.FindHex(mousePos, hexTile);
+
+        int totalcharactercount = GameSystem.CurrentGame().PlayerCount() * classes.Length;
+
+        HashSet<HexTile> tiles = new HashSet<HexTile>();
+        while(tiles.Count<totalcharactercount) {
+            try{
+                tiles.Add(
+                    htc.FindHex(new Vector3(
+                                        UnityEngine.Random.Range(-10f,10f),
+                                        UnityEngine.Random.Range(-10f,10),0f)
+                                        )
+                );
+            } catch(Exception e){}
+        }
+
+        HexTile[] tilearray = new HexTile[totalcharactercount];
+        tiles.CopyTo(tilearray);
+        
+        int cc = 0;
+
+        foreach(Player p in GameSystem.CurrentGame().Players()) {
+            foreach(Character c in p.characters.Values) {
+                
+                Agent a = c.gameCharacter.GetComponent<Agent>();
+                // c.gameCharacter.position
+                a.currentlyOn = tilearray[cc];
+                a.transform.position = tilearray[cc].transform.position;
+                cc++;
+            }
+        }
+
+    }
 }
