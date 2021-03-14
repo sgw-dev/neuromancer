@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
@@ -29,7 +29,7 @@ public class AttackAction : Action
         //if there is a child node it is character
         if(attackLocation.transform.childCount > 0) {
             //get the character
-            other = attackLocation.transform.GetChild(0).GetComponent<PlayerCharacter>().character;
+            other = attackLocation.transform.GetChild(0).GetComponent<Agent>().character;
             other.stats.health -= damage;
         }
         //play animation?

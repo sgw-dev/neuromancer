@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
 
-public class PlayerCharacter : MonoBehaviour
+public class Agent : MonoBehaviour
 {
    
     public Character character;
+    public HexTile   currentlyOn;
     
+
     void Update()
     {
         //probably animate characters here
