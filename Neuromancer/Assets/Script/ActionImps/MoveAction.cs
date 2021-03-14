@@ -33,7 +33,7 @@ public class MoveAction : Action
         //takenby.ActionTakenThisTurn = true;
     }
 
-    bool Execute() 
+    public bool Execute() 
     {
         if(false) {
             //check if the agent can move to the desired tile
