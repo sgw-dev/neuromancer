@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
         {
             float x = Random.Range(-10f,10f);
             float y = Random.Range(-10f,10f);
-            Action a = MoveActionFactory.getInstance().CreateAction(c,new Vector3(x,y,0));
+            Action a = MoveActionFactory.getInstance().CreateAction(c,new Vector3(x,y,0),new Vector3(3f,3f,3f));
             GameSystem.CurrentGame().ExecuteCharacterAction(player,a);
         }
 
@@ -30,6 +30,6 @@ public class PlayerController : MonoBehaviour
     }
 
     public void Attack() {
-
+        // Action a = AttackActionFactory.getInstance().CreateAction();
     }
 }

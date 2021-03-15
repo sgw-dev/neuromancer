@@ -50,9 +50,9 @@ namespace TurnBasedSystem {
             }
         }
 
-        public string WhosTurn() 
+        public Player WhosTurn() 
         {
-            return players.Peek().name;
+            return players.Peek();
         }
 
         public void EndTurn(Player p) {
@@ -128,6 +128,16 @@ namespace TurnBasedSystem {
         public List<Player> Players() 
         {
                 return new List<Player>(players.ToArray());
+        }
+
+        public Dictionary<Player,Character[]> GetPlayersCharacters() 
+        {
+            return null;
+        }
+        
+        public List<Character> AllCharacters() 
+        {
+            return null;
         }
 
         public static GameSystem CurrentGame() 

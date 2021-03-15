@@ -1,9 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
 
-public class AttackAction : Action
+public class AttackAction : TurnBasedSystem.Action
 {
 
     Character takenby;
@@ -20,15 +21,35 @@ public class AttackAction : Action
         this.damage  = damage;//determined by class
         htc = GameObject.Find("TileController").GetComponent<HexTileController>();
     }
-    void Attack(){
-        HexTile attackedtile = htc.FindHex(space);
-        //apply damage to all in the range of the tile;
 
+    void Attack()
+    {
+
+        HexTile attackedtile = htc.FindHex(space);
+
+        //apply damage to all in the range of the tile;
         List<Character> inarea = new List<Character>();
         foreach(Character c in inarea)
         {
             c.stats.health += damage;
         }
+    }
+
+    public List<Character> GetAllInRange(HexTile tile)
+    {
+        List<Character> inrange = new List<Character>();
+        int radius = (int)type;
+        
+        GameObject[] tmp = Array.ConvertAll(htc.FindRadius(tile,radius), t => t.ObjectOnTile);
+        for(int i = 0 ; i < tmp.Length; i++ ){
+            Agent agent = tmp[i].GetComponent<Agent>();  
+            if(agent != null) {
+                inrange.Add(agent.character);
+            }
+        }
+
+        return inrange;
+
     }
 
     //needs to be aware of GameObjects
