@@ -80,9 +80,25 @@ public class HexTileController : MonoBehaviour
         return hexCount;
     }
 
-    public HexTile[] FindRadius(HexTile ht, int radius)
+    public List<HexTile> FindRadius(HexTile hexTile, int radius)
     {
-        return null;
+        List<HexTile> list = new List<HexTile>();
+
+        for (int i = 0; i < 6; i++)
+        {
+            FindRadius(hexTile.nexts[i], ref list, radius, i);
+        }
+        return list;
+    }
+
+    void FindRadius(HexTile current, ref List<HexTile> list, int radius, int dir)
+    {
+        if(radius == 0 || current == null) { return; }
+
+        list.Add(current);
+        FindRadius(current.nexts[dir], ref list, radius - 1, dir);
+        int x = (dir + 1) % 6;
+        FindRadius(current.nexts[x], ref list, radius - 1, x);
     }
 
     void GenerateTiles()
