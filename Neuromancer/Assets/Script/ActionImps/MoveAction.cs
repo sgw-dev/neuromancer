@@ -22,15 +22,14 @@ public class MoveAction : Action
         
         //get the tile
         HexTile tile = htc.FindHex(position);
+        //take character off the current tile
+        takenby.gameCharacter.GetComponent<Agent>().currentlyOn.ObjectOnTile=null;
         //put character onto tile
         takenby.gameCharacter.position = tile.transform.position;
+        tile.ObjectOnTile = takenby.gameCharacter.gameObject;
         //update the tile character refernce
         takenby.gameCharacter.GetComponent<Agent>().currentlyOn = tile;
-        
-        //if the tile holds references update that too
 
-        //finally mark the character as actions taken
-        //takenby.ActionTakenThisTurn = true;
     }
 
     public bool Execute() 
