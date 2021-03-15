@@ -40,7 +40,7 @@ public class AttackAction : TurnBasedSystem.Action
         List<Character> inrange = new List<Character>();
         int radius = (int)type;
         
-        GameObject[] tmp = Array.ConvertAll(htc.FindRadius(tile,radius), t => t.ObjectOnTile);
+        GameObject[] tmp =  Array.ConvertAll<HexTile,GameObject>(htc.FindRadius(tile,radius).ToArray(), t => t.HoldingObject);
         for(int i = 0 ; i < tmp.Length; i++ ){
             Agent agent = tmp[i].GetComponent<Agent>();  
             if(agent != null) {
