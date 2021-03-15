@@ -6,7 +6,7 @@ namespace TurnBasedSystem {
 	public interface Action {
 
 		Character TakenBy();
-		void Execute();
+		bool Execute();
 
 	}
 

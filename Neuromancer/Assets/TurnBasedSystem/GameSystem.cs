@@ -50,9 +50,9 @@ namespace TurnBasedSystem {
             }
         }
 
-        public string WhosTurn() 
+        public Player WhosTurn() 
         {
-            return players.Peek().name;
+            return players.Peek();
         }
 
         public void EndTurn(Player p) {
@@ -104,15 +104,40 @@ namespace TurnBasedSystem {
                 return false;
             }
 
-            //otherwise take the action
-            totake.Execute();
+            if(!p.Equals(players.Peek())){
+                Debug.Log(p.name+"can't use "+ totake.TakenBy()+"  becuase it is not your turn!");
+                return false;
+            }
 
-            return true;
+            if(totake.TakenBy().ActionTakenThisTurn) 
+            {
+                Debug.Log(totake.TakenBy()+" has already taken an action!");
+                return false;
+            }
+
+            //otherwise take the action
+            bool success = totake.Execute();
+            if(success)
+            {
+                totake.TakenBy().ActionTakenThisTurn = true;
+                return true;
+            }
+            return false;
         }
 
         public List<Player> Players() 
         {
                 return new List<Player>(players.ToArray());
+        }
+
+        public Dictionary<Player,Character[]> GetPlayersCharacters() 
+        {
+            return null;
+        }
+        
+        public List<Character> AllCharacters() 
+        {
+            return null;
         }
 
         public static GameSystem CurrentGame() 
