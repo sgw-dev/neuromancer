@@ -7,14 +7,15 @@ public class HexTile : MonoBehaviour , IEquatable<HexTile>
 {
     public HexTile[] nexts = new HexTile[6];
     Vector3 position;
-    [SerializeField] GameObject highlight;
+    [SerializeField] SpriteRenderer highlight;
+    [SerializeField] Color red;
 
     GameObject holdingObject;
     bool isObstacle;
 
     public void Start()
     {
-        highlight.SetActive(false);
+        highlight.enabled = false;
         transform.position = position;
     }
 
@@ -45,11 +46,15 @@ public class HexTile : MonoBehaviour , IEquatable<HexTile>
     {
         holdingObject = obj;
         this.isObstacle = isObstacle;
+        if (isObstacle)
+        {
+            highlight.color = red;
+        }
     }
 
     public void setHighlight(bool b)
     {
-        highlight.SetActive(b);
+        highlight.enabled = b;
     }
 
     //By Spencer

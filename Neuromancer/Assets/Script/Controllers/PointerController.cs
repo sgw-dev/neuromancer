@@ -6,11 +6,15 @@ public class PointerController : MonoBehaviour
 {
     public HexTileController hexTileController;
     HexTile hexTile;
+    SpriteRenderer sprite;
+    [SerializeField] Color red;
+    [SerializeField] Color blue;
 
     public int testCount;
 
     public void Start()
     {
+        sprite = GetComponentInChildren<SpriteRenderer>();
         hexTile = hexTileController.FindHex(transform.position);
         hexTile.setHighlight(true);
         transform.position = hexTile.Position;
@@ -31,6 +35,15 @@ public class PointerController : MonoBehaviour
         hexTile.setHighlight(false);
         hexTile = hexTileController.FindHex(mousePos, hexTile);
         hexTile.setHighlight(true);
+
+        if (hexTile.IsObstacle)
+        {
+            sprite.color = red;
+        }
+        else
+        {
+            sprite.color = blue;
+        }
         transform.position = hexTile.Position;
     }
 
