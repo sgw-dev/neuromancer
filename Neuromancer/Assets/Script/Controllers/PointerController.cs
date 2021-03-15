@@ -6,6 +6,7 @@ public class PointerController : MonoBehaviour
 {
     public HexTileController hexTileController;
     HexTile hexTile;
+    List<HexTile> surrounding;
     SpriteRenderer sprite;
     [SerializeField] Color red;
     [SerializeField] Color blue;
@@ -14,6 +15,8 @@ public class PointerController : MonoBehaviour
 
     public void Start()
     {
+        surrounding = new List<HexTile>();
+
         sprite = GetComponentInChildren<SpriteRenderer>();
         hexTile = hexTileController.FindHex(transform.position);
         hexTile.setHighlight(true);
@@ -24,6 +27,14 @@ public class PointerController : MonoBehaviour
     public void Update()
     {
         MoveHighlight();
+
+        foreach (HexTile ht in surrounding)
+            ht.setHighlight(false);
+        surrounding = hexTileController.FindRadius(hexTile, 4);
+
+        foreach(HexTile ht in surrounding)
+            ht.setHighlight(true);
+
         testCount = hexTileController.FindHexDistance(Vector3.zero, hexTile.Position);
     }
 
