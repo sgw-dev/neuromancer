@@ -138,8 +138,11 @@ public class GameManagerPOC : MonoBehaviour
                 
                 Agent a = c.gameCharacter.GetComponent<Agent>();
                 // c.gameCharacter.position
+                //update character ref
                 a.currentlyOn = tilearray[cc];
                 a.transform.position = tilearray[cc].transform.position;
+                //update tile ref
+                tilearray[cc].ObjectOnTile = c.gameCharacter.gameObject;
                 cc++;
             }
         }
