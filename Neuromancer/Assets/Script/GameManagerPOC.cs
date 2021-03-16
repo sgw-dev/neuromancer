@@ -12,7 +12,23 @@ public class GameManagerPOC : MonoBehaviour
     public Sprite[] sprites;
 
     public GameObject characterPrefab;
-    
+
+    private Vector3[] player1_chars = 
+        new Vector3[] {
+            new Vector3(10f, 0f, 0f),
+            new Vector3(12f, 0f, 0f),
+            new Vector3(11f, 1.5f, 0f),
+            new Vector3(11f, -1.5f, 0f)
+        };
+
+    private Vector3[] player2_chars =
+        new Vector3[] {
+            new Vector3(-10f, 0f, 0f),
+            new Vector3(-12f, 0f, 0f),
+            new Vector3(-11f, 1.5f, 0f),
+            new Vector3(-11f, -1.5f, 0f)
+        };
+
     CharacterClass[] classes = 
         new CharacterClass[] {
                 CharacterClass.MELEE,
@@ -70,6 +86,7 @@ public class GameManagerPOC : MonoBehaviour
                 
             }
         }
+        PutCharactersOnBoard();
     }
 
     //call from button
@@ -96,10 +113,42 @@ public class GameManagerPOC : MonoBehaviour
                 //game is ready, show characters
                 SpriteRenderer r = c.gameCharacter.gameObject.GetComponent<SpriteRenderer>();
                 r.enabled = true;
+                r.sortingLayerName = "Characters";
             }
         }
-        GameObject.Find("Start").SetActive(false);
-        RandomlyPlace();
+        //GameObject.Find("Start").SetActive(false);
+        //RandomlyPlace();
+
+        HexTileController htc = GameObject.Find("TileController").GetComponent<HexTileController>();
+
+        Player player1 = GameSystem.CurrentGame().Players()[0];
+        int index = 0;
+        foreach (Character c in player1.characters.Values)
+        {
+            Agent a = c.gameCharacter.GetComponent<Agent>();
+            // c.gameCharacter.position
+            //update character ref
+            HexTile hex = htc.FindHex(player1_chars[index]);
+            a.currentlyOn = hex;
+            a.transform.position = player1_chars[index];
+            //update tile ref
+            hex.ObjectOnTile = c.gameCharacter.gameObject;
+            index++;
+        }
+        Player player2 = GameSystem.CurrentGame().Players()[1];
+        index = 0;
+        foreach (Character c in player2.characters.Values)
+        {
+            Agent a = c.gameCharacter.GetComponent<Agent>();
+            // c.gameCharacter.position
+            //update character ref
+            HexTile hex = htc.FindHex(player2_chars[index]);
+            a.currentlyOn = hex;
+            a.transform.position = player2_chars[index];
+            //update tile ref
+            hex.ObjectOnTile = c.gameCharacter.gameObject;
+            index++;
+        }
     }
 
     // public void AddActionTo(Player p , Action a) {
