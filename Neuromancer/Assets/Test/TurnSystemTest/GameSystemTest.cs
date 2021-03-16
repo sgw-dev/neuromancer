@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -63,7 +64,55 @@ namespace Tests
 
         }
 
+        [Test]
+        public void CharacterPlayerDictionaryReturnedByGameSystem()
+        {
+            Player     me    = new Player("me");
+            Player     notme = new Player("not_me");
+            GameSystem gs    = new GameSystem(me,notme);
+            CharacterClass[] charactersInGame = 
+                new CharacterClass[] {
+                    CharacterClass.MELEE,
+                    CharacterClass.RANGED,
+                    CharacterClass.PSYONIC,
+                    CharacterClass.HACKER
+                    };
+            gs.AssignPlayerCharacters(me,charactersInGame);
+            gs.AssignPlayerCharacters(notme,charactersInGame); 
+            Dictionary<Player,Character[]> tmp = gs.GetPlayersCharacters();
+            
+            Assert.NotNull(tmp);
+            Assert.AreEqual(tmp.Count,2);
+            
+            Character[] chs = new Character[charactersInGame.Length];
+            tmp.TryGetValue(me,out chs);
+            Array.ForEach(chs,c => Debug.Log(c.name));
 
+            tmp.TryGetValue(notme,out chs);
+            Array.ForEach(chs,c => Debug.Log(c.name));
+
+
+        }
+
+        [Test]
+        public void CharactersReturnedByGameSystem()
+        {
+            Player     me    = new Player("me");
+            Player     notme = new Player("not_me");
+            GameSystem gs    = new GameSystem(me,notme);
+            CharacterClass[] charactersInGame = 
+                new CharacterClass[] {
+                    CharacterClass.MELEE,
+                    CharacterClass.RANGED,
+                    CharacterClass.PSYONIC,
+                    CharacterClass.HACKER
+                    };
+            gs.AssignPlayerCharacters(me,charactersInGame);
+            gs.AssignPlayerCharacters(notme,charactersInGame); 
+
+            Assert.AreEqual(gs.AllCharacters().Count,charactersInGame.Length * gs.Players().Count);
+
+        }
 
     }
 }
