@@ -132,12 +132,26 @@ namespace TurnBasedSystem {
 
         public Dictionary<Player,Character[]> GetPlayersCharacters() 
         {
-            return null;
+            Dictionary<Player,Character[]> playersCharacters = new Dictionary<Player,Character[]>();
+            foreach(Player p in Players())
+            {
+                Character[] tmp = new Character[p.characters.Values.Count];
+                p.characters.Values.CopyTo(tmp,0);
+                playersCharacters.Add(p,tmp);
+            }
+            return playersCharacters;
         }
         
         public List<Character> AllCharacters() 
         {
-            return null;
+            List<Character> allcharacters = new List<Character>();
+
+            foreach(Player p in Players())
+            {
+                allcharacters.AddRange(p.characters.Values);
+            }
+            
+            return allcharacters;
         }
 
         public static GameSystem CurrentGame() 
