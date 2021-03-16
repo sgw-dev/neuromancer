@@ -3,13 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Search
+public static class Search
 {
-    public Search()
-    {
 
-    }
-    public List<int> GreedySearch(HexTile start, HexTile end, HexTileController htc)
+    public static List<int> GreedySearch(HexTile start, HexTile end, HexTileController htc)
     {
         List<HexTile> closeSet = new List<HexTile>();
         PriorityQueue fringe = new PriorityQueue();
@@ -30,7 +27,7 @@ public class Search
             int action = 0;
             foreach(HexTile nextState in state.nexts)
             {
-                if(nextState != null)
+                if(nextState != null && !nextState.IsObstacle)
                 {
                     List<int> newActions = new List<int>();
                     foreach (int i in actions)

@@ -11,6 +11,8 @@ public class AIMover : MonoBehaviour
     private HexTile destTile;
     private bool movingFlag = false;
 
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -24,11 +26,10 @@ public class AIMover : MonoBehaviour
         {
             destTile = pc.HexTile;
             
-            Search search = new Search();
             HexTile startTile = htc.FindHex(agent.transform.position);
             if (!destTile.Equals(startTile))
             {
-                List<int> path = search.GreedySearch(startTile, destTile, htc);
+                List<int> path = Search.GreedySearch(startTile, destTile, htc);
                 StartCoroutine(Move(path, 0.5f));
                 movingFlag = true;
             }
