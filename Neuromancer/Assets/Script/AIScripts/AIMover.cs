@@ -13,7 +13,7 @@ public class AIMover : MonoBehaviour
     private HexTile destTile;
     private bool movingFlag = false;
 
-    private Player player;
+    public Player player;
 
     CharacterClass[] classes =
         new CharacterClass[] {
@@ -33,45 +33,69 @@ public class AIMover : MonoBehaviour
     void Update()
     {
         
-        player = GameSystem.CurrentGame().Players()[1];
         //If it is my turn
-        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn()))
+        /*if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
             foreach(CharacterClass cc in classes)
             {
                 Character character = player.characters[cc.ToString()];
                 
             }
-        }
-        
-        if (Input.GetButtonDown("Fire1") && !movingFlag)
+        }*/
+        //Debug.Log("It is " + GameSystem.CurrentGame().WhosTurn().name + "'s turn");
+        if (Input.GetButtonDown("Fire1") && !movingFlag && player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
-            Player enemyPlayer = GameSystem.CurrentGame().Players()[0];
+            Debug.Log(player.name + "(AI) Turn");
+            //If it is my turn, I am players[0] and the enemy is players[1]
+            Player enemyPlayer = GameSystem.CurrentGame().Players()[1];
             List<Character> myChars = new List<Character>(player.characters.Values);
             List<Character> enemyChars = new List<Character>(enemyPlayer.characters.Values);
-            GameState gameState = new GameState(myChars, enemyChars, htc.FindHex(myChars[0].gameCharacter.position), myChars[0]);
-            MiniAction miniAction = Search.DecideAction(gameState, htc);
-            Debug.Log(miniAction.type);
-            
-            switch (miniAction.type)
+            foreach(Character character in myChars)
             {
-                case "Move":
-                    HexTile startTile = htc.FindHex(myChars[0].gameCharacter.position);
-                    MiniMove move = miniAction as MiniMove;
-                    List<int> path = Search.GreedySearch(startTile, move.Dest, htc);
-                    //Path ends on the destination (the enemy player), remove the last element
-                    //Because we can't move ontop of a player
-                    Debug.Log("Full path is " + printArray(path));
-                    //Only send the first few steps
-                    int speed = myChars[0].stats.speed;
-                    Debug.Log("Stride is " + speed);
-                    path = TrimPath(path, speed);
-                    Debug.Log("Trimmed Path " + printArray(path));
-                    StartCoroutine(Move(myChars[0].gameCharacter.gameObject, path, 0.5f));
-                    break;
-                case "Attack":
-                    break;
+                GameState gameState = new GameState(myChars, enemyChars, htc.FindHex(character.gameCharacter.position), character);
+                MiniAction miniAction = Search.DecideAction(gameState, htc);
+                //Debug.Log(character.name+" will "+miniAction.type);
+
+                switch (miniAction.type)
+                {
+                    case "Move":
+                        HexTile startTile = htc.FindHex(character.gameCharacter.position);
+                        MiniMove move = miniAction as MiniMove;
+                        List<int> path = Search.GreedySearch(startTile, move.Dest, htc);
+                        //Path ends on the destination (the enemy player), remove the last element
+                        //Because we can't move ontop of a player
+                        //Only send the first few steps
+                        int speed = character.stats.speed;
+                        Debug.Log("Path before : " + printArray(path));
+                        List<Vector3> moves = new List<Vector3>();
+                        if (path.Count > 0)
+                        {
+                            path = TrimPath(path, speed);
+                            Debug.Log("Path after : " + printArray(path));
+                            moves.Add(startTile.nexts[path[0]].Position);
+                            for (int i = 1; i < path.Count; i++)
+                            {
+                                int neighbor = path[i];
+                                moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
+
+                            }
+                        }
+                        else
+                        {
+                            moves.Add(character.gameCharacter.position);
+                        }
+                        
+                        Debug.Log("Moving to " + moves[moves.Count - 1]);
+                        Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
+                        GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                        //StartCoroutine(Move(character.gameCharacter.gameObject, path, 0.5f));
+                        break;
+                    case "Attack":
+                        break;
+                }
             }
+            //End the AI's turn
+            EndMyTurn();
             /*destTile = pointer.HexTile;
             
             HexTile startTile = htc.FindHex(agent.transform.position);
@@ -84,6 +108,10 @@ public class AIMover : MonoBehaviour
             
             
         }
+    }
+    public void EndMyTurn()
+    {
+        GameSystem.CurrentGame().EndTurn(player);
     }
     public List<int> TrimPath(List<int> path, int moveRadius)
     {

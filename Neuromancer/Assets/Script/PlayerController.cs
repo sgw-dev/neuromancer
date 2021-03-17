@@ -22,6 +22,15 @@ public class PlayerController : MonoBehaviour
         }
 
     }
+    void Update()
+    {
+        //If it is my turn
+        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
+        {
+            Debug.Log(player.name +"(Player) Turn");
+            EndMyTurn();
+        }
+    }
 
 
     public void EndMyTurn() 
