@@ -9,7 +9,7 @@ public class AttackAction : TurnBasedSystem.Action
 
     Character takenby;
     Vector3 space;
-    AttackType type;
+    int range;
     int damage;
     HexTileController htc;
 
@@ -17,8 +17,8 @@ public class AttackAction : TurnBasedSystem.Action
     {
         this.space   = space;
         this.takenby = takenby;
-        this.type    = type;//determine by character class
-        this.damage  = damage;//determined by class
+        this.range   = takenby.stats.range;//determine by character class
+        this.damage  = takenby.stats.attackdmg;//determined by class
         htc = GameObject.Find("TileController").GetComponent<HexTileController>();
     }
 
@@ -26,19 +26,36 @@ public class AttackAction : TurnBasedSystem.Action
     {
 
         HexTile attackedtile = htc.FindHex(space);
-
-        //apply damage to all in the range of the tile;
-        List<Character> inarea = new List<Character>();
-        foreach(Character c in inarea)
+        if(takenby.characterclass.Equals(CharacterClass.HACKER))
         {
-            c.stats.health += damage;
+            //deals AOE
+            ///2 is hard coded, in future replace with a character class variable
+            List<Character> inarea = GetAllInAOERange(attackedtile,2);
+            foreach(Character c in inarea)
+            {
+                c.stats.health += damage;
+            }
+        } 
+        else 
+        {//deal damage to single object
+            if(attackedtile.HoldingObject != null)
+            {
+                Agent totakedamage = attackedtile.HoldingObject.GetComponent<Agent>();
+                
+                if(totakedamage != null) 
+                {
+                    totakedamage.Health(damage);
+                }
+
+            }
         }
+        
     }
 
-    public List<Character> GetAllInRange(HexTile tile)
+    public List<Character> GetAllInAOERange(HexTile tile,int tiles)
     {
         List<Character> inrange = new List<Character>();
-        int radius = (int)type;
+        int radius = tiles;
         
         GameObject[] tmp =  Array.ConvertAll<HexTile,GameObject>(htc.FindRadius(tile,radius).ToArray(), t => t.HoldingObject);
         for(int i = 0 ; i < tmp.Length; i++ ){
