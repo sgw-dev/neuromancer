@@ -10,7 +10,7 @@ public class HexTile : MonoBehaviour , IEquatable<HexTile>
     [SerializeField] SpriteRenderer highlight;
     [SerializeField] Color red;
 
-    GameObject holdingObject;
+    GameObject holdingObject = null;
     bool isObstacle;
 
     public void Start()

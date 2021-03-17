@@ -76,6 +76,35 @@ public class GameManagerPOC : MonoBehaviour
                 ctmp.character = c;//dont forget 
                 c.gameCharacter = tmp.transform;
 
+                //Add the agent stats for each Character
+                switch (c.characterclass)
+                {
+                    case CharacterClass.MELEE:
+                        c.stats.health = 10;
+                        c.stats.speed = 3;
+                        c.stats.range = 1;
+                        c.stats.attackdmg = 3;
+                        break;
+                    case CharacterClass.HACKER:
+                        c.stats.health = 5;
+                        c.stats.speed = 2;
+                        c.stats.range = 3;
+                        c.stats.attackdmg = 2;
+                        break;
+                    case CharacterClass.RANGED:
+                        c.stats.health = 5;
+                        c.stats.speed = 2;
+                        c.stats.range = 5;
+                        c.stats.attackdmg = 4;
+                        break;
+                    case CharacterClass.PSYONIC:
+                        c.stats.health = 5;
+                        c.stats.speed = 2;
+                        c.stats.range = 2;
+                        c.stats.attackdmg = -2;
+                        break;
+                }
+
                 //put the sprite onto
                 SpriteRenderer renderer = tmp.AddComponent<SpriteRenderer>();
                 renderer.sprite=sprites[(int)c.characterclass];
@@ -132,7 +161,7 @@ public class GameManagerPOC : MonoBehaviour
             a.currentlyOn = hex;
             a.transform.position = player1_chars[index];
             //update tile ref
-            hex.SetObject(c.gameCharacter.gameObject, true);
+            hex.SetObject(c.gameCharacter.gameObject, false);
             index++;
         }
         Player player2 = GameSystem.CurrentGame().Players()[1];
@@ -146,7 +175,7 @@ public class GameManagerPOC : MonoBehaviour
             a.currentlyOn = hex;
             a.transform.position = player2_chars[index];
             //update tile ref
-            hex.SetObject(c.gameCharacter.gameObject, true);
+            hex.SetObject(c.gameCharacter.gameObject, false);
             index++;
         }
     }

@@ -55,4 +55,9 @@ public class Agent : MonoBehaviour
         character.stats.speed += change;
     }
 
+    public void AttackDmg(int change)
+    {
+        character.stats.attackdmg += change;
+    }
+
 }
