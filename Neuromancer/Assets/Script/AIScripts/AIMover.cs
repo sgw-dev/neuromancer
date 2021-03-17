@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using TurnBasedSystem;
 using UnityEngine;
+using static Search;
 
 public class AIMover : MonoBehaviour
 {
@@ -45,7 +46,33 @@ public class AIMover : MonoBehaviour
         
         if (Input.GetButtonDown("Fire1") && !movingFlag)
         {
-            destTile = pointer.HexTile;
+            Player enemyPlayer = GameSystem.CurrentGame().Players()[0];
+            List<Character> myChars = new List<Character>(player.characters.Values);
+            List<Character> enemyChars = new List<Character>(enemyPlayer.characters.Values);
+            GameState gameState = new GameState(myChars, enemyChars, htc.FindHex(myChars[0].gameCharacter.position), myChars[0]);
+            MiniAction miniAction = Search.DecideAction(gameState, htc);
+            Debug.Log(miniAction.type);
+            
+            switch (miniAction.type)
+            {
+                case "Move":
+                    HexTile startTile = htc.FindHex(myChars[0].gameCharacter.position);
+                    MiniMove move = miniAction as MiniMove;
+                    List<int> path = Search.GreedySearch(startTile, move.Dest, htc);
+                    //Path ends on the destination (the enemy player), remove the last element
+                    //Because we can't move ontop of a player
+                    Debug.Log("Full path is " + printArray(path));
+                    //Only send the first few steps
+                    int speed = myChars[0].stats.speed;
+                    Debug.Log("Stride is " + speed);
+                    path = TrimPath(path, speed);
+                    Debug.Log("Trimmed Path " + printArray(path));
+                    StartCoroutine(Move(myChars[0].gameCharacter.gameObject, path, 0.5f));
+                    break;
+                case "Attack":
+                    break;
+            }
+            /*destTile = pointer.HexTile;
             
             HexTile startTile = htc.FindHex(agent.transform.position);
             if (!destTile.Equals(startTile))
@@ -53,12 +80,33 @@ public class AIMover : MonoBehaviour
                 List<int> path = Search.GreedySearch(startTile, destTile, htc);
                 StartCoroutine(Move(path, 0.5f));
                 movingFlag = true;
-            }
+            }*/
             
             
         }
     }
-    public IEnumerator Move(List<int> path, float frameTime)
+    public List<int> TrimPath(List<int> path, int moveRadius)
+    {
+        //Remove last
+        path.RemoveAt(path.Count - 1);
+        //Limit to agent's range
+        List<int> temp = new List<int>();
+        for(int i = 0; i < Mathf.Min(moveRadius, path.Count); i++)
+        {
+            temp.Add(path[i]);
+        }
+        return temp;
+    }
+    public string printArray(List<int> list)
+    {
+        string s = "";
+        foreach(int i in list)
+        {
+            s += i + ", ";
+        }
+        return s;
+    }
+    public IEnumerator Move(GameObject agent, List<int> path, float frameTime)
     {
         foreach(int step in path)
         {

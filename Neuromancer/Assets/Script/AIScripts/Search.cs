@@ -7,11 +7,11 @@ public static class Search
 {
     public class GameState
     {
-        public Character[] aiChars;
-        public Character[] playerChars;
+        public List<Character> aiChars;
+        public List<Character> playerChars;
         public HexTile selfTile;
         public Character selfChar;
-        public GameState(Character[] ai, Character[] pc, HexTile st, Character sc)
+        public GameState(List<Character> ai, List<Character> pc, HexTile st, Character sc)
         {
             aiChars = ai;
             playerChars = pc;
@@ -19,11 +19,64 @@ public static class Search
             selfChar = sc;
         }
     }
-    public static String DecideAction(GameState gameState, HexTileController htc)
+    public class MiniAction
+    {
+        public String type;
+    }
+    public class MiniAttack : MiniAction
+    {
+        public Character toAttack;
+    }
+    public class MiniMove : MiniAction
+    {
+        public HexTile Dest;
+    }
+    public static MiniAction DecideAction(GameState gameState, HexTileController htc)
     {
         int radius = gameState.selfChar.stats.range;
+        // **** Spencer Notes ******
+        /*  Could possible imporve this by checking if any of the 4 player
+         *  Characters are in range for an attack, instead of checking every hex
+         *  in range for a character.
+         *  
+         *  Note: Had to do this since ai was attacking its own team
+         */
         List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, radius);
-        return "Nothing";
+        Character closestChar = null;
+        int closestDistance = int.MaxValue;
+        foreach (Character character in gameState.playerChars)
+        {
+            int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
+            if (distance <= radius && distance < closestDistance)
+            {
+                closestDistance = distance;
+                closestChar = character;
+            }
+        }
+        if(closestDistance < int.MaxValue)
+        {
+            return new MiniAttack() { type="Attack", toAttack = closestChar};
+        }
+        // **** Spencer Notes ******
+        /* Could not find anything to attack so move towards the closest player character
+         */
+        HexTile destTile = null;
+        closestDistance = int.MaxValue;
+        foreach (Character character in gameState.playerChars)
+        {
+            int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
+            if (distance < closestDistance)
+            {
+                closestDistance = distance;
+                destTile = htc.FindHex(character.gameCharacter.position);
+            }
+        }
+        if (closestDistance < int.MaxValue)
+        {
+            return new MiniMove() { type = "Move", Dest = destTile };
+        }
+        return new MiniAction() { type = "fail"};
+
     }
     public static List<int> GreedySearch(HexTile start, HexTile end, HexTileController htc)
     {
@@ -31,8 +84,10 @@ public static class Search
         PriorityQueue fringe = new PriorityQueue();
 
         fringe.Push((start, new List<int>()), 0);
+
+        int sentinel = 100;
         
-        while (fringe.HasNext()){
+        while (fringe.HasNext() && sentinel > 0){
             (HexTile state, List<int> actions) = fringe.Pop();
             if (state.Position.Equals(end.Position))
             {
@@ -46,7 +101,20 @@ public static class Search
             int action = 0;
             foreach(HexTile nextState in state.nexts)
             {
-                if(nextState != null && !nextState.IsObstacle)
+                //Check if the next tile is the goal state, 
+                // if it is, allow the AI to step onto it
+                bool validMove = false;
+                if(nextState != null)
+                {
+                    if(nextState.HoldingObject == null)
+                    {
+                        validMove = true;
+                    }else if (nextState.Position.Equals(end.Position))
+                    {
+                        validMove = true;
+                    }
+                }
+                if(validMove)
                 {
                     List<int> newActions = new List<int>();
                     foreach (int i in actions)
@@ -60,6 +128,7 @@ public static class Search
                 
                 action++;
             }
+            sentinel--;
         }
         return new List<int>() { };
         
