@@ -9,7 +9,7 @@ public class AttackAction : TurnBasedSystem.Action
 
     Character takenby;
     Vector3 space;
-    AttackType type;
+    int range;
     int damage;
     HexTileController htc;
 
@@ -17,8 +17,8 @@ public class AttackAction : TurnBasedSystem.Action
     {
         this.space   = space;
         this.takenby = takenby;
-        this.type    = type;//determine by character class
-        this.damage  = damage;//determined by class
+        this.range   = takenby.stats.range;//determine by character class
+        this.damage  = takenby.stats.attackdmg;//determined by class
         htc = GameObject.Find("TileController").GetComponent<HexTileController>();
     }
 
