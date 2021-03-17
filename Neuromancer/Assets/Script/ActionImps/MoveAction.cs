@@ -23,10 +23,10 @@ public class MoveAction : Action
         //get the tile
         HexTile tile = htc.FindHex(position);
         //take character off the current tile
-        takenby.gameCharacter.GetComponent<Agent>().currentlyOn.ObjectOnTile=null;
+        takenby.gameCharacter.GetComponent<Agent>().currentlyOn.SetObject(null,false);
         //put character onto tile
         takenby.gameCharacter.position = tile.transform.position;
-        tile.ObjectOnTile = takenby.gameCharacter.gameObject;
+        tile.SetObject(takenby.gameCharacter.gameObject,false);
         //update the tile character refernce
         takenby.gameCharacter.GetComponent<Agent>().currentlyOn = tile;
 

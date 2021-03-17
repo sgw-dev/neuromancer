@@ -191,7 +191,7 @@ public class GameManagerPOC : MonoBehaviour
                 a.currentlyOn = tilearray[cc];
                 a.transform.position = tilearray[cc].transform.position;
                 //update tile ref
-                tilearray[cc].ObjectOnTile = c.gameCharacter.gameObject;
+                tilearray[cc].SetObject(c.gameCharacter.gameObject,false);
                 cc++;
             }
         }
