@@ -56,6 +56,8 @@ public class GameManagerPOC : MonoBehaviour
 
         //assign the player script to the human player
         GameObject.Find("Player").GetComponent<PlayerController>().player = player1;
+        //assign the player script to the AI player
+        Camera.main.GetComponent<AIMover>().player = player2;
 
         Material sprites_default = new Material(Shader.Find("Sprites/Default"));;
         

@@ -78,6 +78,7 @@ public static class Search
         return new MiniAction() { type = "fail"};
 
     }
+
     public static List<int> GreedySearch(HexTile start, HexTile end, HexTileController htc)
     {
         List<HexTile> closeSet = new List<HexTile>();
