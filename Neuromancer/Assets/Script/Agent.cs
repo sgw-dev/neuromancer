@@ -35,6 +35,10 @@ public class Agent : MonoBehaviour
     {
         return character.stats.speed;
     }
+    public int Range()
+    {
+        return character.stats.range;
+    }
 
     public void Health(int change)
     {
@@ -49,6 +53,11 @@ public class Agent : MonoBehaviour
     public void Speed(int change) 
     {
         character.stats.speed += change;
+    }
+
+    public void AttackDmg(int change)
+    {
+        character.stats.attackdmg += change;
     }
 
 }

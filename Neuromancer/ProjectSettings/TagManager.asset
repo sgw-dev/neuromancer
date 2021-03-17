@@ -46,3 +46,6 @@ TagManager:
   - name: Grid
     uniqueID: 1576350477
     locked: 0
+  - name: Characters
+    uniqueID: 61628189
+    locked: 0

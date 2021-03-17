@@ -12,7 +12,23 @@ public class GameManagerPOC : MonoBehaviour
     public Sprite[] sprites;
 
     public GameObject characterPrefab;
-    
+
+    private Vector3[] player1_chars = 
+        new Vector3[] {
+            new Vector3(10f, 0f, 0f),
+            new Vector3(12f, 0f, 0f),
+            new Vector3(11f, 1.5f, 0f),
+            new Vector3(11f, -1.5f, 0f)
+        };
+
+    private Vector3[] player2_chars =
+        new Vector3[] {
+            new Vector3(-10f, 0f, 0f),
+            new Vector3(-12f, 0f, 0f),
+            new Vector3(-11f, 1.5f, 0f),
+            new Vector3(-11f, -1.5f, 0f)
+        };
+
     CharacterClass[] classes = 
         new CharacterClass[] {
                 CharacterClass.MELEE,
@@ -60,6 +76,35 @@ public class GameManagerPOC : MonoBehaviour
                 ctmp.character = c;//dont forget 
                 c.gameCharacter = tmp.transform;
 
+                //Add the agent stats for each Character
+                switch (c.characterclass)
+                {
+                    case CharacterClass.MELEE:
+                        c.stats.health = 10;
+                        c.stats.speed = 3;
+                        c.stats.range = 1;
+                        c.stats.attackdmg = 3;
+                        break;
+                    case CharacterClass.HACKER:
+                        c.stats.health = 5;
+                        c.stats.speed = 2;
+                        c.stats.range = 3;
+                        c.stats.attackdmg = 2;
+                        break;
+                    case CharacterClass.RANGED:
+                        c.stats.health = 5;
+                        c.stats.speed = 2;
+                        c.stats.range = 5;
+                        c.stats.attackdmg = 4;
+                        break;
+                    case CharacterClass.PSYONIC:
+                        c.stats.health = 5;
+                        c.stats.speed = 2;
+                        c.stats.range = 2;
+                        c.stats.attackdmg = -2;
+                        break;
+                }
+
                 //put the sprite onto
                 SpriteRenderer renderer = tmp.AddComponent<SpriteRenderer>();
                 renderer.sprite=sprites[(int)c.characterclass];
@@ -70,6 +115,7 @@ public class GameManagerPOC : MonoBehaviour
                 
             }
         }
+        PutCharactersOnBoard();
     }
 
     //call from button
@@ -96,10 +142,42 @@ public class GameManagerPOC : MonoBehaviour
                 //game is ready, show characters
                 SpriteRenderer r = c.gameCharacter.gameObject.GetComponent<SpriteRenderer>();
                 r.enabled = true;
+                r.sortingLayerName = "Characters";
             }
         }
-        GameObject.Find("Start").SetActive(false);
-        RandomlyPlace();
+        //GameObject.Find("Start").SetActive(false);
+        //RandomlyPlace();
+
+        HexTileController htc = GameObject.Find("TileController").GetComponent<HexTileController>();
+
+        Player player1 = GameSystem.CurrentGame().Players()[0];
+        int index = 0;
+        foreach (Character c in player1.characters.Values)
+        {
+            Agent a = c.gameCharacter.GetComponent<Agent>();
+            // c.gameCharacter.position
+            //update character ref
+            HexTile hex = htc.FindHex(player1_chars[index]);
+            a.currentlyOn = hex;
+            a.transform.position = player1_chars[index];
+            //update tile ref
+            hex.SetObject(c.gameCharacter.gameObject, false);
+            index++;
+        }
+        Player player2 = GameSystem.CurrentGame().Players()[1];
+        index = 0;
+        foreach (Character c in player2.characters.Values)
+        {
+            Agent a = c.gameCharacter.GetComponent<Agent>();
+            // c.gameCharacter.position
+            //update character ref
+            HexTile hex = htc.FindHex(player2_chars[index]);
+            a.currentlyOn = hex;
+            a.transform.position = player2_chars[index];
+            //update tile ref
+            hex.SetObject(c.gameCharacter.gameObject, false);
+            index++;
+        }
     }
 
     // public void AddActionTo(Player p , Action a) {
@@ -142,7 +220,7 @@ public class GameManagerPOC : MonoBehaviour
                 a.currentlyOn = tilearray[cc];
                 a.transform.position = tilearray[cc].transform.position;
                 //update tile ref
-                tilearray[cc].ObjectOnTile = c.gameCharacter.gameObject;
+                tilearray[cc].SetObject(c.gameCharacter.gameObject,false);
                 cc++;
             }
         }

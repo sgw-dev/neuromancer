@@ -5,13 +5,12 @@ using UnityEngine;
 
 public class HexTile : MonoBehaviour , IEquatable<HexTile>
 {
-    public GameObject ObjectOnTile;
     public HexTile[] nexts = new HexTile[6];
     Vector3 position;
     [SerializeField] SpriteRenderer highlight;
     [SerializeField] Color red;
 
-    GameObject holdingObject;
+    GameObject holdingObject = null;
     bool isObstacle;
 
     public void Start()
