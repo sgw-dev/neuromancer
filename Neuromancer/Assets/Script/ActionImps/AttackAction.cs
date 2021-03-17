@@ -30,7 +30,7 @@ public class AttackAction : TurnBasedSystem.Action
         {
             //deals AOE
             ///2 is hard coded, in future replace with a character class variable
-            List<Character> inarea = GetAllInRange(attackedtile,2);
+            List<Character> inarea = GetAllInAOERange(attackedtile,2);
             foreach(Character c in inarea)
             {
                 c.stats.health += damage;
@@ -52,10 +52,10 @@ public class AttackAction : TurnBasedSystem.Action
         
     }
 
-    public List<Character> GetAllInRange(HexTile tile,int tiles)
+    public List<Character> GetAllInAOERange(HexTile tile,int tiles)
     {
         List<Character> inrange = new List<Character>();
-        int radius = (int)type;
+        int radius = tiles;
         
         GameObject[] tmp =  Array.ConvertAll<HexTile,GameObject>(htc.FindRadius(tile,radius).ToArray(), t => t.HoldingObject);
         for(int i = 0 ; i < tmp.Length; i++ ){
