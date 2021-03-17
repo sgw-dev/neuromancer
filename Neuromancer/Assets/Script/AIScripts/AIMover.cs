@@ -31,6 +31,7 @@ public class AIMover : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         player = GameSystem.CurrentGame().Players()[1];
         //If it is my turn
         if (player.name.Equals(GameSystem.CurrentGame().WhosTurn()))
@@ -38,9 +39,10 @@ public class AIMover : MonoBehaviour
             foreach(CharacterClass cc in classes)
             {
                 Character character = player.characters[cc.ToString()];
+                
             }
         }
-        /*
+        
         if (Input.GetButtonDown("Fire1") && !movingFlag)
         {
             destTile = pointer.HexTile;
@@ -54,7 +56,7 @@ public class AIMover : MonoBehaviour
             }
             
             
-        }*/
+        }
     }
     public IEnumerator Move(List<int> path, float frameTime)
     {

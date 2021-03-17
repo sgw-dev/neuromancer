@@ -132,7 +132,7 @@ public class GameManagerPOC : MonoBehaviour
             a.currentlyOn = hex;
             a.transform.position = player1_chars[index];
             //update tile ref
-            hex.ObjectOnTile = c.gameCharacter.gameObject;
+            hex.SetObject(c.gameCharacter.gameObject, true);
             index++;
         }
         Player player2 = GameSystem.CurrentGame().Players()[1];
@@ -146,7 +146,7 @@ public class GameManagerPOC : MonoBehaviour
             a.currentlyOn = hex;
             a.transform.position = player2_chars[index];
             //update tile ref
-            hex.ObjectOnTile = c.gameCharacter.gameObject;
+            hex.SetObject(c.gameCharacter.gameObject, true);
             index++;
         }
     }

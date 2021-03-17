@@ -5,7 +5,26 @@ using UnityEngine;
 
 public static class Search
 {
-
+    public class GameState
+    {
+        public Character[] aiChars;
+        public Character[] playerChars;
+        public HexTile selfTile;
+        public Character selfChar;
+        public GameState(Character[] ai, Character[] pc, HexTile st, Character sc)
+        {
+            aiChars = ai;
+            playerChars = pc;
+            selfTile = st;
+            selfChar = sc;
+        }
+    }
+    public static String DecideAction(GameState gameState, HexTileController htc)
+    {
+        int radius = gameState.selfChar.stats.range;
+        List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, radius);
+        return "Nothing";
+    }
     public static List<int> GreedySearch(HexTile start, HexTile end, HexTileController htc)
     {
         List<HexTile> closeSet = new List<HexTile>();
