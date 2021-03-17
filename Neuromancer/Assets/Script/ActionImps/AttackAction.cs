@@ -26,16 +26,33 @@ public class AttackAction : TurnBasedSystem.Action
     {
 
         HexTile attackedtile = htc.FindHex(space);
-
-        //apply damage to all in the range of the tile;
-        List<Character> inarea = new List<Character>();
-        foreach(Character c in inarea)
+        if(takenby.characterclass.Equals(CharacterClass.HACKER))
         {
-            c.stats.health += damage;
+            //deals AOE
+            ///2 is hard coded, in future replace with a character class variable
+            List<Character> inarea = GetAllInRange(attackedtile,2);
+            foreach(Character c in inarea)
+            {
+                c.stats.health += damage;
+            }
+        } 
+        else 
+        {//deal damage to single object
+            if(attackedtile.HoldingObject != null)
+            {
+                Agent totakedamage = attackedtile.HoldingObject.GetComponent<Agent>();
+                
+                if(totakedamage != null) 
+                {
+                    totakedamage.Health(damage);
+                }
+
+            }
         }
+        
     }
 
-    public List<Character> GetAllInRange(HexTile tile)
+    public List<Character> GetAllInRange(HexTile tile,int tiles)
     {
         List<Character> inrange = new List<Character>();
         int radius = (int)type;
