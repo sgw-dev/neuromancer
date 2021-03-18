@@ -43,7 +43,7 @@ public class AIMover : MonoBehaviour
             }
         }*/
         //Debug.Log("It is " + GameSystem.CurrentGame().WhosTurn().name + "'s turn");
-        if (Input.GetButtonDown("Fire1") && !movingFlag && player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
+        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
             Debug.Log(player.name + "(AI) Turn");
             //If it is my turn, I am players[0] and the enemy is players[1]
