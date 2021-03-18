@@ -93,10 +93,21 @@ public class HexTileController : MonoBehaviour
 
     void FindRadius(HexTile current, ref List<HexTile> list, int radius, int dir)
     {
-        if(radius == 0 || current == null) { return; }
-
+        if(current == null || radius <= 0)
+        {
+            return;
+        }
         list.Add(current);
-        FindRadius(current.nexts[dir], ref list, radius - 1, dir);
+
+        if (current.IsObstacle)
+        {
+            FindRadius(current.nexts[dir], ref list, radius - 2, dir);
+        }
+        else
+        {
+            FindRadius(current.nexts[dir], ref list, radius - 1, dir);
+        }
+
         int x = (dir + 1) % 6;
         FindRadius(current.nexts[x], ref list, radius - 1, x);
     }

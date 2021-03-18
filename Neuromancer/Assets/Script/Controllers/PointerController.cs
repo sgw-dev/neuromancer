@@ -30,7 +30,7 @@ public class PointerController : MonoBehaviour
 
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
-        surrounding = hexTileController.FindRadius(hexTile, 4);
+        surrounding = hexTileController.FindRadius(hexTile, 2);
 
         foreach(HexTile ht in surrounding)
             ht.setHighlight(true);
