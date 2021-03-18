@@ -5,8 +5,10 @@ using UnityEngine;
 namespace TurnBasedSystem {
     public class GameSystem {
 
-        int            turn;        //indicates the round
-        List<Player>   players;     //set of players
+        public static GameSystem currentGame; 
+
+        int             turn;        //indicates the round
+        Queue<Player>   players;     //set of players
         
         //ScriptableObject Template
         public PredefinedTestCharacterStats char_stat_loader;
@@ -23,16 +25,14 @@ namespace TurnBasedSystem {
         {
 
             turn = 0;
-            players = new List<Player>();
+            players = new Queue<Player>();
 
             for (int i = 0 ; i < all.Length; i++) 
             {
-                players.Add(all[i]);
+                players.Enqueue(all[i]);
             }
 
-
-            //ForcePlayersReady();
-            //CreatePlayersActions();//for turn 1
+            currentGame = this;
 
         }
 
@@ -50,133 +50,118 @@ namespace TurnBasedSystem {
             }
         }
 
-        /*
-         * Adds an action to a players list of actions that player wishes
-         * to take for a turn.
-         */
-        public void AddCharacterAction(Action a,Player owner) {
-            if (!owner.inprogress_character_actions.Contains(a)) {
-                owner.inprogress_character_actions.Add(a);
-            }
+        public Player WhosTurn() 
+        {
+            return players.Peek();
         }
 
+        public void EndTurn(Player p) {
 
-        public void EndTurn() {
-
-            //check if all players are ready for the turns to end
-            if (!allReady()) 
+            //Check if the player trying to end, is actually whos turn it is
+            if (!players.Peek().Equals(p)) 
             {
+                Debug.Log(p.name+" can't end " + players.Peek().name +"'s turn");
                 return;
             }
-            //combine all players moves in order to determine playout
-            CombineActions(players.ToArray());
-            //execute the moves
-            ExecuteActions();
+
+            //get player reference
+            Player endingturn = players.Dequeue();
             
             //end
-            TurnCleanUp();
+            TurnCleanUp(endingturn);//does nothing right now
+            
 
             turn++;
+            Debug.Log(endingturn.name + " turn end.");
+
+            //add player back to queue
+            players.Enqueue(endingturn);
+
         }
 
-
-        bool allReady() {
-            
-            bool isEveryoneReady = true;
-            
-            foreach(Player p in players)
-            {
-                isEveryoneReady &= p.ReadyToEndTurn;
-            }
-            
-            return isEveryoneReady;
-        }
-
-        void TurnCleanUp() 
+        //reset some flags
+        void TurnCleanUp(Player p) 
         {
-
-            //mark players as ready
-            ForcePlayersReady();
-            //clear players list of possible actions
-            //clear actions about to be taken(already executed)
-            for(int i = 0 ; i < players.Count; i++ ){
-                players[i].possible_character_actions.Clear();
-                players[i].inprogress_character_actions.Clear();
-            }
             
-        }
-
-        void ForcePlayersReady() {
-
-            for (int i = 0 ; i < PlayerCount() ; i++ ) 
+            //reset the characters
+            foreach(Character c in p.characters.Values) 
             {
-                players[i].TurnReset();
+                c.ActionTakenThisTurn = false;
             }
 
         }
 
-        //should rely on outside 
-        // void CreatePlayersActions() {
-
-        //     //come back to this
-            
-        //     for (int i = 0 ; i < PlayerCount() ; i++ ) 
-        //     {
-        //         //clear their list
-        //         players[i].possible_character_actions.Clear();
-        //         //get new list
-        //         // players[i].possible_character_actions 
-        //         //     = ActionManager.GetAttackFactory().GetPlayerActions(players[i]);
-
-        //         foreach(Character kv in players[i].characters.Values) {
-        //             players[i].possible_character_actions.AddRange(
-        //                 ActionManager.GetAttackFactory().GetActions(kv)
-        //             );
-        //         }
-        //     }
-            
-        // }
 
         public int PlayerCount() {
             return players.Count;
         }
 
-    
-        public void CombineActions(params Player[] players) 
+        public bool ExecuteCharacterAction(Player p,Action totake)
         {
-            
-            combinedActionsSet = new List<Action>();
-            
-            foreach(Player p in players)
-            {
-                combinedActionsSet.AddRange(p.inprogress_character_actions);
+            //check to see if the character is owned by player
+            if(!p.characters.ContainsValue(totake.TakenBy())) {
+                Debug.LogError(p.name + " can't use " + totake.TakenBy() );
+                return false;
             }
 
-            //compare based on character speed, see compare to in character class
-            combinedActionsSet.Sort((a1,a2) => 
-                    a1.TakenBy().CompareTo(a2.TakenBy())
-            );
-
-        }
-
-        /*
-         * Calls action interface to execute actions,
-         * Each action should know "how" each action
-         * is to be executed based on class
-         */
-        void ExecuteActions()
-        {
-
-            foreach(Action a in combinedActionsSet) 
-            {
-                a.Execute();
+            if(!p.Equals(players.Peek())){
+                Debug.Log(p.name+"can't use "+ totake.TakenBy()+"  becuase it is not your turn!");
+                return false;
             }
 
+            if(totake.TakenBy().ActionTakenThisTurn) 
+            {
+                Debug.Log(totake.TakenBy()+" has already taken an action!");
+                return false;
+            }
+
+            //otherwise take the action
+            bool success = totake.Execute();
+            if(success)
+            {
+                totake.TakenBy().ActionTakenThisTurn = true;
+                return true;
+            }
+            return false;
         }
 
         public List<Player> Players() 
         {
-                return players;
+                return new List<Player>(players.ToArray());
+        }
+
+        public Dictionary<Player,Character[]> GetPlayersCharacters() 
+        {
+            Dictionary<Player,Character[]> playersCharacters = new Dictionary<Player,Character[]>();
+            foreach(Player p in Players())
+            {
+                Character[] tmp = new Character[p.characters.Values.Count];
+                p.characters.Values.CopyTo(tmp,0);
+                playersCharacters.Add(p,tmp);
+            }
+            return playersCharacters;
+        }
+        
+        public List<Character> AllCharacters() 
+        {
+            List<Character> allcharacters = new List<Character>();
+
+            foreach(Player p in Players())
+            {
+                allcharacters.AddRange(p.characters.Values);
+            }
+            
+            return allcharacters;
+        }
+
+        public static GameSystem CurrentGame() 
+        {
+            if(currentGame ==null )
+            {
+                Debug.LogError("Game has not started yet.");
+            }
+
+            return currentGame;
         }
 
         #if UNITY_EDITOR

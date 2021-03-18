@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
 
-public class PlayerCharacter : MonoBehaviour
+public class Agent : MonoBehaviour
 {
    
     public Character character;
+    public HexTile   currentlyOn;
     
+
     void Update()
     {
         //probably animate characters here
@@ -33,6 +35,10 @@ public class PlayerCharacter : MonoBehaviour
     {
         return character.stats.speed;
     }
+    public int Range()
+    {
+        return character.stats.range;
+    }
 
     public void Health(int change)
     {
@@ -47,6 +53,11 @@ public class PlayerCharacter : MonoBehaviour
     public void Speed(int change) 
     {
         character.stats.speed += change;
+    }
+
+    public void AttackDmg(int change)
+    {
+        character.stats.attackdmg += change;
     }
 
 }

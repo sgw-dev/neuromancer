@@ -10,10 +10,14 @@ public class MoveActionFactory : ActionFactory
 
     public List<Action> GetActions(Character c) {
         List<Action> actions = new List<Action>();
-        actions.Add(new MoveAction(c,2));
+        //actions.Add(new MoveAction(c,2));
         return actions;
     }
 
+    public Action CreateAction(Character c, params Vector3[] moves)
+    {
+        return new MoveAction(c,moves[0]);
+    }
     
     public static MoveActionFactory getInstance() 
     {
