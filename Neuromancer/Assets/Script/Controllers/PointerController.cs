@@ -28,12 +28,14 @@ public class PointerController : MonoBehaviour
     {
         MoveHighlight();
 
+        /*
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
         surrounding = hexTileController.FindRadius(hexTile, 2);
 
         foreach(HexTile ht in surrounding)
             ht.setHighlight(true);
+            */
 
         testCount = hexTileController.FindHexDistance(Vector3.zero, hexTile.Position);
     }

@@ -96,6 +96,8 @@ public class AIMover : MonoBehaviour
             }
             //End the AI's turn
             EndMyTurn();
+
+
             /*destTile = pointer.HexTile;
             
             HexTile startTile = htc.FindHex(agent.transform.position);

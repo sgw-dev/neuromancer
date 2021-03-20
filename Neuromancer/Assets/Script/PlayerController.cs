@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
+using UnityEngine.EventSystems;
 
 public class PlayerController : MonoBehaviour
 {
@@ -33,40 +34,46 @@ public class PlayerController : MonoBehaviour
         if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
             List<Character> myChars = new List<Character>(player.characters.Values);
-            if (Input.GetButtonDown("Fire1"))
+            if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
             {
-                if(activeChar == null)
+                if(!inSecondarySelect)
                 {
                     Vector3 pos = pointer.HexTile.Position;
+                    //Assume no characters are selected (hide buttons)
+                    PlayerButtons.SetActive(false);
+                    activeChar = null;
                     foreach (Character c in myChars)
                     {
                         if (c.gameCharacter.position.Equals(pos))
                         {
                             activeChar = c;
+                            c.SetSelected(true);
+                            PlayerButtons.SetActive(true);
+                            if (activeChar.ActionTakenThisTurn)
+                            {
+                                ButtonCover.SetActive(true);
+                            }
+                            else
+                            {
+                                ButtonCover.SetActive(false);
+                            }
+                        }
+                        else
+                        {
+                            c.SetSelected(false);
                         }
                     }
-                }
-                if(activeChar != null && !inSecondarySelect)
-                {
-                    Debug.Log("Active character is " + activeChar.name);
-                    //Show action buttons
-                    PlayerButtons.SetActive(true);
-                    if (activeChar.ActionTakenThisTurn)
+                    if (activeChar != null)
                     {
-                        Debug.Log("Cannot act");
-                        ButtonCover.SetActive(true);
-                    }
-                    else
-                    {
-                        Debug.Log("Can act");
-                        ButtonCover.SetActive(false);
+                        
                     }
                 }
+                
 
             }
             if (moving)
             {
-                if (Input.GetButtonDown("Fire1"))
+                if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
                 {
                     Action a = MoveActionFactory.getInstance().CreateAction(activeChar, pointer.HexTile.Position);
                     GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
@@ -93,6 +100,12 @@ public class PlayerController : MonoBehaviour
             }
             if (allDone)
             {
+                PlayerButtons.SetActive(false);
+                foreach (Character character in myChars)
+                {
+                    character.SetSelected(false);
+                }
+                activeChar = null;
                 EndMyTurn();
             }
             
@@ -111,22 +124,14 @@ public class PlayerController : MonoBehaviour
 
     public void Move()
     {
-        //demonstration
-        /*foreach (Character c in player.characters.Values)
-        {
-            float x = Random.Range(-10f, 10f);
-            float y = Random.Range(-10f, 10f);
-            Action a = MoveActionFactory.getInstance().CreateAction(c, new Vector3(x, y, 0), new Vector3(3f, 3f, 3f));
-            GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
-        }*/
         CancelButton.SetActive(true);
         inSecondarySelect = true;
         moving = true;
-        /*Action a = MoveActionFactory.getInstance().CreateAction(activeChar, pointer.HexTile.Position);
-        GameSystem.CurrentGame().ExecuteCharacterAction(player, a);*/
     }
     public void Attack() {
-        // Action a = AttackActionFactory.getInstance().CreateAction();
+        CancelButton.SetActive(true);
+        inSecondarySelect = true;
+        attacking = true;
     }
     public void Cancel()
     {
