@@ -49,7 +49,8 @@ public class GameManagerPOC : MonoBehaviour
 
         //create the game
         gameSystem = new GameSystem(player1, player2);
-        
+        gameSystem.monoref = this;
+
         //make sure all players get their characters, for >2 make a loop
         gameSystem.AssignPlayerCharacters(player1,classes);
         gameSystem.AssignPlayerCharacters(player2,classes);

@@ -86,7 +86,8 @@ public class AIMover : MonoBehaviour
                         }
                         
                         Debug.Log("Moving to " + moves[moves.Count - 1]);
-                        Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
+                        //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
+                        Action a = MoveActionFactory.getInstance().CreateAction(character, moves.ToArray());
                         GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
                         //StartCoroutine(Move(character.gameCharacter.gameObject, path, 0.5f));
                         break;
