@@ -66,12 +66,12 @@ public class AIMover : MonoBehaviour
                         //Because we can't move ontop of a player
                         //Only send the first few steps
                         int speed = character.stats.speed;
-                        Debug.Log("Path before : " + printArray(path));
+                        //Debug.Log("Path before : " + printArray(path));
                         List<Vector3> moves = new List<Vector3>();
                         if (path.Count > 0)
                         {
                             path = TrimPath(path, speed);
-                            Debug.Log("Path after : " + printArray(path));
+                            //Debug.Log("Path after : " + printArray(path));
                             moves.Add(startTile.nexts[path[0]].Position);
                             for (int i = 1; i < path.Count; i++)
                             {
@@ -85,7 +85,7 @@ public class AIMover : MonoBehaviour
                             moves.Add(character.gameCharacter.position);
                         }
                         
-                        Debug.Log("Moving to " + moves[moves.Count - 1]);
+                        //Debug.Log("Moving to " + moves[moves.Count - 1]);
                         //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
                         Action a = MoveActionFactory.getInstance().CreateAction(character, moves.ToArray());
                         GameSystem.CurrentGame().ExecuteCharacterAction(player, a);

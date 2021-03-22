@@ -20,11 +20,14 @@ public class PlayerController : MonoBehaviour
 
     public GameObject CancelButton;
 
+    List<HexTile> surrounding;
+
     void Start()
     {
         activeChar = null;
         PlayerButtons.SetActive(false);
         CancelButton.SetActive(false);
+        surrounding = new List<HexTile>();
     }
 
     
@@ -75,12 +78,32 @@ public class PlayerController : MonoBehaviour
             {
                 if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
                 {
-                    Action a = MoveActionFactory.getInstance().CreateAction(activeChar, pointer.HexTile.Position);
-                    GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
-                    moving = false;
-                    inSecondarySelect = false;
-                    ButtonCover.SetActive(true);
-                    CancelButton.SetActive(false);
+                    if (surrounding.Contains(pointer.HexTile))
+                    {
+                        HexTile startTile = htc.FindHex(activeChar.gameCharacter.position);
+                        List<int> path = Search.GreedySearch(startTile, pointer.HexTile, htc);
+                        List<Vector3> moves = new List<Vector3>();
+                        if (path.Count > 0)
+                        {
+                            moves.Add(startTile.nexts[path[0]].Position);
+                            for (int i = 1; i < path.Count; i++)
+                            {
+                                int neighbor = path[i];
+                                moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
+
+                            }
+                        }
+                        Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
+                        GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                        moving = false;
+                        inSecondarySelect = false;
+                        ButtonCover.SetActive(true);
+                        CancelButton.SetActive(false);
+                        pointer.SetCanHighlight(true);
+                        foreach (HexTile ht in surrounding)
+                            ht.setHighlight(false);
+                    }
+                    
                 }
             }
 
@@ -106,6 +129,7 @@ public class PlayerController : MonoBehaviour
                     character.SetSelected(false);
                 }
                 activeChar = null;
+                pointer.SetCanHighlight(true);
                 EndMyTurn();
             }
             
@@ -127,6 +151,12 @@ public class PlayerController : MonoBehaviour
         CancelButton.SetActive(true);
         inSecondarySelect = true;
         moving = true;
+
+        pointer.SetCanHighlight(false);
+
+        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed);
+        foreach (HexTile ht in surrounding)
+            ht.setHighlight(true);
     }
     public void Attack() {
         CancelButton.SetActive(true);
@@ -137,5 +167,11 @@ public class PlayerController : MonoBehaviour
     {
         CancelButton.SetActive(false);
         inSecondarySelect = false;
+        if(surrounding != null)
+        {
+            foreach (HexTile ht in surrounding)
+                ht.setHighlight(false);
+        }
+        pointer.SetCanHighlight(true);
     }
 }
