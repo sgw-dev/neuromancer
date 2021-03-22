@@ -143,7 +143,9 @@ public class PlayerController : MonoBehaviour
     }
     public void Wait()
     {
-
+        Action a = MoveActionFactory.getInstance().CreateAction(activeChar, activeChar.gameCharacter.position);
+        GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+        ButtonCover.SetActive(true);
     }
 
     public void Move()
