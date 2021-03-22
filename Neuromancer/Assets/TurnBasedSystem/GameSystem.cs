@@ -15,7 +15,7 @@ namespace TurnBasedSystem {
 
         List<Action>    combinedActionsSet;
         List<Character> character_pool;
-
+        public MonoBehaviour monoref;
 
         /*
          * Initial Game Setup
@@ -119,7 +119,7 @@ namespace TurnBasedSystem {
             bool success = totake.Execute();
             if(success)
             {
-                totake.TakenBy().ActionTakenThisTurn = true;
+                // totake.TakenBy().ActionTakenThisTurn = true;
                 return true;
             }
             return false;
