@@ -37,7 +37,7 @@ public class MoveAction : Action
             takenby.gameCharacter.GetComponent<Agent>().currentlyOn = tile;
             //increment the action
             current_move_action++;
-            yield return new WaitForSecondsRealtime(1f);
+            yield return new WaitForSecondsRealtime(0.25f);
         }
     }
 
