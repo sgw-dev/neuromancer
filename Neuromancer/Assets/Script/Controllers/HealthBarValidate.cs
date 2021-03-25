@@ -22,6 +22,7 @@ public class HealthBarValidate : MonoBehaviour
         UpdateWidth();
     }
 
+    /*
     public void OnValidate()
     {
         if (Application.isPlaying)
@@ -38,6 +39,7 @@ public class HealthBarValidate : MonoBehaviour
             catch { }
         };
     }
+    */
 
     public void MoveHandle(float precent)
     {

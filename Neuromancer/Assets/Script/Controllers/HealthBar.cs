@@ -7,7 +7,7 @@ public class HealthBar : HealthBarValidate
     public float changeRate = .5f;
     ParticleSystem particles;
 
-    public float max, current;
+    float max, current;
 
     public override void Initialize()
     {
