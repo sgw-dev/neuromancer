@@ -21,13 +21,13 @@ public class AttackActionFactory : ActionFactory
         }
         return factory;
     }
-
+    /*
     AttackActionFactory()
     {
         if(factory==null) 
         {
             factory=new AttackActionFactory();
         }
-    }
+    }*/
 
 }

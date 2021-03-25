@@ -15,6 +15,7 @@ public class AIMover : MonoBehaviour
 
     public Player player;
 
+    
     CharacterClass[] classes =
         new CharacterClass[] {
                 CharacterClass.MELEE,
@@ -45,7 +46,6 @@ public class AIMover : MonoBehaviour
         //Debug.Log("It is " + GameSystem.CurrentGame().WhosTurn().name + "'s turn");
         if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
-            Debug.Log(player.name + "(AI) Turn");
             //If it is my turn, I am players[0] and the enemy is players[1]
             Player enemyPlayer = GameSystem.CurrentGame().Players()[1];
             List<Character> myChars = new List<Character>(player.characters.Values);
@@ -89,6 +89,7 @@ public class AIMover : MonoBehaviour
                         //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
                         Action a = MoveActionFactory.getInstance().CreateAction(character, moves.ToArray());
                         GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                        
                         //StartCoroutine(Move(character.gameCharacter.gameObject, path, 0.5f));
                         break;
                     case "Attack":
@@ -137,13 +138,12 @@ public class AIMover : MonoBehaviour
         }
         return s;
     }
-    public IEnumerator Move(GameObject agent, List<int> path, float frameTime)
+    public IEnumerator WaitForIt(float frameTime)
     {
-        foreach(int step in path)
-        {
-            agent.transform.position = htc.FindHex(agent.transform.position).nexts[step].Position;
-            yield return new WaitForSeconds(frameTime);
-        }
+        movingFlag = true;
+        Debug.Log("Waiting...");
+        yield return new WaitForSeconds(frameTime);
+        Debug.Log("Done!");
         movingFlag = false;
     }
 }

@@ -93,7 +93,8 @@ public class AttackAction : TurnBasedSystem.Action
             //check if tile is in range
             return false;
         }
-        
+        //*****Added by Spencer ******
+        takenby.ActionTakenThisTurn = true;
         Attack();
         return true;
     }

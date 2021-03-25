@@ -106,11 +106,37 @@ public class PlayerController : MonoBehaviour
                     
                 }
             }
+            if (attacking)
+            {
+                if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
+                {
+                    if (surrounding.Contains(pointer.HexTile))
+                    {
+                        bool isOnCharacter = false;
+                        List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
+                        foreach (Character c in allChars)
+                        {
+                            if (c.gameCharacter.position.Equals(pointer.HexTile.Position))
+                            {
+                                isOnCharacter = true;
+                            }
+                        }
+                        if (isOnCharacter)
+                        {
+                            Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, pointer.HexTile.Position);
+                            GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                            attacking = false;
+                            inSecondarySelect = false;
+                            ButtonCover.SetActive(true);
+                            CancelButton.SetActive(false);
+                            pointer.SetCanHighlight(true);
+                            foreach (HexTile ht in surrounding)
+                                ht.setHighlight(false);
+                        }                        
+                    }
 
-            //Debug.Log(player.name +"(Player) Turn");
-
-
-
+                }
+            }
 
             //Determining if the player is all done
             bool allDone = true;
@@ -156,7 +182,7 @@ public class PlayerController : MonoBehaviour
 
         pointer.SetCanHighlight(false);
 
-        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed);
+        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed, true);
         foreach (HexTile ht in surrounding)
             ht.setHighlight(true);
     }
@@ -164,6 +190,12 @@ public class PlayerController : MonoBehaviour
         CancelButton.SetActive(true);
         inSecondarySelect = true;
         attacking = true;
+
+        pointer.SetCanHighlight(false);
+
+        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.range, false);
+        foreach (HexTile ht in surrounding)
+            ht.setHighlight(true);
     }
     public void Cancel()
     {
