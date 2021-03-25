@@ -34,6 +34,10 @@ public class AttackAction : TurnBasedSystem.Action
             foreach(Character c in inarea)
             {
                 c.stats.health += damage;
+                foreach(Player p in GameSystem.CurrentGame().Players())
+                {
+                    GameSystem.CurrentGame().CheckDeath(c,p);
+                }
             }
         } 
         else 
@@ -45,6 +49,11 @@ public class AttackAction : TurnBasedSystem.Action
                 if(totakedamage != null) 
                 {
                     totakedamage.Health(damage);
+                    foreach(Player p in GameSystem.CurrentGame().Players())
+                    {
+                        GameSystem.CurrentGame().CheckDeath(totakedamage.character,p);
+                    }
+
                 }
 
             }
@@ -69,32 +78,24 @@ public class AttackAction : TurnBasedSystem.Action
 
     }
 
-    //needs to be aware of GameObjects
-    public bool Execute() {
-
-        // //Get the tile that the character is attacking from
-        // HexTile characterLocation = takenby.gameCharacter.parent.gameObject.GetComponent<HexTile>();
-        // //find the space indicated by space
-        // HexTile attackLocation = characterLocation.nexts[space];
-        // Character other = null;
-        // //if there is a child node it is character
-        // if(attackLocation.transform.childCount > 0) {
-        //     //get the character
-        //     other = attackLocation.transform.GetChild(0).GetComponent<Agent>().character;
-        //     other.stats.health -= damage;
-        // }
-        // //play animation?
+    public bool Execute() 
+    {
         // Debug.Log(takenby+" is attacking "+space+" with a " + type.ToString() + " attack.");
 
         //check if tile is in attack range
-
         //get tile
-        if(false){
-            //check if tile is in range
+        int totaldistance = htc.FindHexDistance(takenby.gameCharacter.position,space);
+        
+        //check if tile is in range
+        if(totaldistance > this.range )
+        {
+            //failed to take action so return false and allow something else to happen
             return false;
         }
         //*****Added by Spencer ******
         takenby.ActionTakenThisTurn = true;
+
+        Debug.Log(takenby+" attacks " + space);
         Attack();
         return true;
     }

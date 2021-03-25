@@ -16,18 +16,10 @@ public class AttackActionFactory : ActionFactory
 
     public static AttackActionFactory GetInstance()
     {
-        if(factory is null) {
+        if(factory == null) {
             return new AttackActionFactory();
         }
         return factory;
     }
-    /*
-    AttackActionFactory()
-    {
-        if(factory==null) 
-        {
-            factory=new AttackActionFactory();
-        }
-    }*/
 
 }

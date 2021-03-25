@@ -164,6 +164,18 @@ namespace TurnBasedSystem {
             return currentGame;
         }
 
+        public void CheckDeath(Character c,Player p)
+        {   
+            if(c.stats.health <= 0) 
+            {
+                p.characters.Remove(c.name);
+                MarkedForDeath mfd = c.gameCharacter.gameObject.AddComponent<MarkedForDeath>();
+                mfd.Setup(.1f);
+                //character will die after the .1f seconds
+                //GameObject.Destroy(c.gameCharacter.gameObject);
+            }
+        }
+
         #if UNITY_EDITOR
             // public void TEST_CreatePlayersActions() {
             //     CreatePlayersActions();
