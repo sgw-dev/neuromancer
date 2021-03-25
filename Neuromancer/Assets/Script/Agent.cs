@@ -10,7 +10,7 @@ public class Agent : MonoBehaviour
     public HexTile   currentlyOn;
 
     
-    HealthBar healthBar;
+    public HealthBar healthBar;
 
     public void Start()
     {
