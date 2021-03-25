@@ -8,8 +8,6 @@ public class HealthBar : HealthBarValidate
     ParticleSystem particles;
 
     public float max, current;
-    public bool update;
-    public float tohealth;
 
     public void Start()
     {
@@ -17,29 +15,20 @@ public class HealthBar : HealthBarValidate
         particles = GetComponentInChildren<ParticleSystem>();
     }
 
-    public void Update()
-    {
-        if (update)
-        {
-            StartChangeHealth(tohealth);
-            update = false;
-        }
-    }
-
-    public void SetMax(float value)
+    public void SetMax(int value)
     {
         max = value;
-        StartChangeHealth(value);
+        ChangeHealth(value);
     }
 
-    public void StartChangeHealth(float value)
+    public void ChangeHealth(int value)
     {
         StopAllCoroutines();
-        StartCoroutine(ChangeHealth(value));
+        StartCoroutine(ChangeHealthBar(value));
     }
 
 
-    IEnumerator ChangeHealth(float to)
+    IEnumerator ChangeHealthBar(float to)
     {
         particles.Play();
         float from = current;
