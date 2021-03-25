@@ -17,7 +17,7 @@ public class HealthBarValidate : MonoBehaviour
     Vector3 fillSize;
     Vector3 backgroundSize;
 
-    public void Start()
+    public virtual void Initialize()
     {
         UpdateWidth();
     }
@@ -32,7 +32,7 @@ public class HealthBarValidate : MonoBehaviour
         {
             try
             {
-                Start();
+                UpdateWidth();
                 MoveHandle(value);
             }
             catch { }

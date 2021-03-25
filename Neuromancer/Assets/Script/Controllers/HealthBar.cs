@@ -9,14 +9,15 @@ public class HealthBar : HealthBarValidate
 
     public float max, current;
 
-    public void Start()
+    public override void Initialize()
     {
-        base.Start();
+        base.Initialize();
         particles = GetComponentInChildren<ParticleSystem>();
     }
 
     public void SetMax(int value)
     {
+        Initialize();
         max = value;
         ChangeHealth(value);
     }
