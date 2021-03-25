@@ -44,7 +44,7 @@ namespace TurnBasedSystem {
             //create classes.length characters for player p
             foreach(CharacterClass c in classes){
                 p.characters.Add(
-                        c.ToString(),
+                        p.name+"_"+c.ToString(),
                         CharacterFactory.getInstance().CreateCharacter(c)
                     );
             }

@@ -22,6 +22,9 @@ public class PlayerController : MonoBehaviour
 
     List<HexTile> surrounding;
 
+    [SerializeField]
+    public List<Character> myChars;
+
     void Start()
     {
         activeChar = null;
@@ -36,7 +39,8 @@ public class PlayerController : MonoBehaviour
         //If it is my turn
         if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
-            List<Character> myChars = new List<Character>(player.characters.Values);
+            myChars = new List<Character>(player.characters.Values);
+            //Debug.Log("I see " + myChars.Count + " Characters");
             if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
             {
                 if(!inSecondarySelect)

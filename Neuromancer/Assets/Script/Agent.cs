@@ -42,9 +42,7 @@ public class Agent : MonoBehaviour
 
     public void Health(int change)
     {
-        Debug.Log("Health Before: " + character.stats.health);
         character.stats.health -= change;
-        Debug.Log("Health After: " + character.stats.health);
     }
 
     public void Energy(int change)
