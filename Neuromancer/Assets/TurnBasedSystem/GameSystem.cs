@@ -170,7 +170,7 @@ namespace TurnBasedSystem {
             {
                 p.characters.Remove(c.name);
                 MarkedForDeath mfd = c.gameCharacter.gameObject.AddComponent<MarkedForDeath>();
-                mfd.Setup(.1f);
+                mfd.Setup(1f);
                 //character will die after the .1f seconds
                 //GameObject.Destroy(c.gameCharacter.gameObject);
             }
