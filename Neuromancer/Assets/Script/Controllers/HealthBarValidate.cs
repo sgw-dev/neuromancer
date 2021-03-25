@@ -45,7 +45,7 @@ public class HealthBarValidate : MonoBehaviour
         float x = backgroundSize.x * value;
         handlePosition.x = x + left;
         fillSize.x = x;
-        handle.position = handlePosition;
+        handle.localPosition = handlePosition;
         fill.size = fillSize;
     }
 
@@ -60,12 +60,12 @@ public class HealthBarValidate : MonoBehaviour
 
         fillSize = fill.size;
         backgroundSize = background.size;
-        handlePosition = handle.position;
+        handlePosition = handle.localPosition;
 
-        Vector3 origin = fill.transform.position;
+        Vector3 origin = fill.transform.localPosition;
         origin = new Vector3(left, origin.y, origin.z);
-        fill.transform.position = origin;
-        background.transform.position = origin;
+        fill.transform.localPosition = origin;
+        background.transform.localPosition = origin;
 
         backgroundSize.x = width;
         background.size = backgroundSize;

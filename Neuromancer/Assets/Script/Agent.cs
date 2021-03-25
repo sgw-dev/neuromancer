@@ -8,7 +8,17 @@ public class Agent : MonoBehaviour
    
     public Character character;
     public HexTile   currentlyOn;
+
     
+    HealthBar healthBar;
+
+    public void Start()
+    {
+        GameObject tmp = (GameObject)Resources.Load("HealthBar", typeof(GameObject));
+        healthBar = Instantiate(tmp, transform).GetComponent<HealthBar>();
+        healthBar.SetMax(Health());
+    }
+
 
     void Update()
     {
@@ -43,6 +53,7 @@ public class Agent : MonoBehaviour
     public void Health(int change)
     {
         character.stats.health += change;
+        healthBar.ChangeHealth(Health());
     }
 
     public void Energy(int change)
