@@ -13,6 +13,8 @@ public class PointerController : MonoBehaviour
 
     public int testCount;
 
+    private bool canHighlight = true;
+
     public void Start()
     {
         surrounding = new List<HexTile>();
@@ -26,14 +28,19 @@ public class PointerController : MonoBehaviour
 
     public void Update()
     {
-        MoveHighlight();
 
+        MoveHighlight();
+        
+        
+
+        /*
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
         surrounding = hexTileController.FindRadius(hexTile, 2);
 
         foreach(HexTile ht in surrounding)
             ht.setHighlight(true);
+            */
 
         testCount = hexTileController.FindHexDistance(Vector3.zero, hexTile.Position);
     }
@@ -43,19 +50,32 @@ public class PointerController : MonoBehaviour
         Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePos.z = 0;
 
-        hexTile.setHighlight(false);
+        if (canHighlight)
+        {
+            hexTile.setHighlight(false);
+        }
+        
         hexTile = hexTileController.FindHex(mousePos, hexTile);
-        hexTile.setHighlight(true);
+        if (canHighlight)
+        {
+            hexTile.setHighlight(true);
 
-        if (hexTile.IsObstacle)
-        {
-            sprite.color = red;
+            if (hexTile.IsObstacle)
+            {
+                sprite.color = red;
+            }
+            else
+            {
+                sprite.color = blue;
+            }
         }
-        else
-        {
-            sprite.color = blue;
-        }
+        
         transform.position = hexTile.Position;
+    }
+    public void SetCanHighlight(bool canH)
+    {
+        canHighlight = canH;
+        hexTile.setHighlight(false);
     }
 
     public Vector3 Position

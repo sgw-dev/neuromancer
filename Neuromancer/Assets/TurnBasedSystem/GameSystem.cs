@@ -15,7 +15,7 @@ namespace TurnBasedSystem {
 
         List<Action>    combinedActionsSet;
         List<Character> character_pool;
-
+        public MonoBehaviour monoref;
 
         /*
          * Initial Game Setup
@@ -44,7 +44,7 @@ namespace TurnBasedSystem {
             //create classes.length characters for player p
             foreach(CharacterClass c in classes){
                 p.characters.Add(
-                        c.ToString(),
+                        p.name+"_"+c.ToString(),
                         CharacterFactory.getInstance().CreateCharacter(c)
                     );
             }
@@ -119,7 +119,7 @@ namespace TurnBasedSystem {
             bool success = totake.Execute();
             if(success)
             {
-                totake.TakenBy().ActionTakenThisTurn = true;
+                // totake.TakenBy().ActionTakenThisTurn = true;
                 return true;
             }
             return false;
@@ -162,6 +162,18 @@ namespace TurnBasedSystem {
             }
 
             return currentGame;
+        }
+
+        public void CheckDeath(Character c,Player p)
+        {   
+            if(c.stats.health <= 0) 
+            {
+                p.characters.Remove(c.name);
+                MarkedForDeath mfd = c.gameCharacter.gameObject.AddComponent<MarkedForDeath>();
+                mfd.Setup(1f);
+                //character will die after the .1f seconds
+                //GameObject.Destroy(c.gameCharacter.gameObject);
+            }
         }
 
         #if UNITY_EDITOR

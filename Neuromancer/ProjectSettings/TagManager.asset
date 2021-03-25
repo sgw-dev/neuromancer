@@ -49,3 +49,6 @@ TagManager:
   - name: Characters
     uniqueID: 61628189
     locked: 0
+  - name: Highlights
+    uniqueID: 3031586779
+    locked: 0

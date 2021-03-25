@@ -16,7 +16,7 @@ public class MoveActionFactory : ActionFactory
 
     public Action CreateAction(Character c, params Vector3[] moves)
     {
-        return new MoveAction(c,moves[0]);
+        return new MoveAction(c,moves);
     }
     
     public static MoveActionFactory getInstance() 

@@ -80,18 +80,18 @@ public class HexTileController : MonoBehaviour
         return hexCount;
     }
 
-    public List<HexTile> FindRadius(HexTile hexTile, int radius)
+    public List<HexTile> FindRadius(HexTile hexTile, int radius, bool checkObstacle = false)
     {
         List<HexTile> list = new List<HexTile>();
 
         for (int i = 0; i < 6; i++)
         {
-            FindRadius(hexTile.nexts[i], ref list, radius, i);
+            FindRadius(hexTile.nexts[i], ref list, radius, i, checkObstacle);
         }
         return list;
     }
 
-    void FindRadius(HexTile current, ref List<HexTile> list, int radius, int dir)
+    void FindRadius(HexTile current, ref List<HexTile> list, int radius, int dir, bool checkObstacle)
     {
         if(current == null || radius <= 0)
         {
@@ -99,17 +99,17 @@ public class HexTileController : MonoBehaviour
         }
         list.Add(current);
 
-        if (current.IsObstacle || current.HoldingObject != null)
+        if (checkObstacle && current.IsObstacle)
         {
-            FindRadius(current.nexts[dir], ref list, radius - 2, dir);
+            FindRadius(current.nexts[dir], ref list, radius - 2, dir, checkObstacle);
         }
         else
         {
-            FindRadius(current.nexts[dir], ref list, radius - 1, dir);
+            FindRadius(current.nexts[dir], ref list, radius - 1, dir, checkObstacle);
         }
 
         int x = (dir + 1) % 6;
-        FindRadius(current.nexts[x], ref list, radius - 1, x);
+        FindRadius(current.nexts[x], ref list, radius - 1, x, checkObstacle);
     }
 
     void GenerateTiles()

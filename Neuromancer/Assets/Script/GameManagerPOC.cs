@@ -12,6 +12,9 @@ public class GameManagerPOC : MonoBehaviour
     public Sprite[] sprites;
 
     public GameObject characterPrefab;
+    public GameObject enemyHighlight;
+    public GameObject playerHighlight;
+    public GameObject selectHighlight;
 
     private Vector3[] player1_chars = 
         new Vector3[] {
@@ -49,7 +52,8 @@ public class GameManagerPOC : MonoBehaviour
 
         //create the game
         gameSystem = new GameSystem(player1, player2);
-        
+        gameSystem.monoref = this;
+
         //make sure all players get their characters, for >2 make a loop
         gameSystem.AssignPlayerCharacters(player1,classes);
         gameSystem.AssignPlayerCharacters(player2,classes);
@@ -165,20 +169,31 @@ public class GameManagerPOC : MonoBehaviour
             //update tile ref
             hex.SetObject(c.gameCharacter.gameObject, false);
             index++;
+
+            //Add highlight to players
+            Instantiate(playerHighlight, c.gameCharacter);
+            GameObject temp = Instantiate(selectHighlight, c.gameCharacter);
+            c.selectedHighlight = temp;
+            c.SetSelected(false);
         }
         Player player2 = GameSystem.CurrentGame().Players()[1];
         index = 0;
         foreach (Character c in player2.characters.Values)
         {
             Agent a = c.gameCharacter.GetComponent<Agent>();
-            // c.gameCharacter.position
-            //update character ref
+            // c.gameCharacter.pte character ref
             HexTile hex = htc.FindHex(player2_chars[index]);
             a.currentlyOn = hex;
             a.transform.position = player2_chars[index];
             //update tile ref
             hex.SetObject(c.gameCharacter.gameObject, false);
             index++;
+
+            //Add highlight to enemies
+            Instantiate(enemyHighlight, c.gameCharacter);
+            GameObject temp = Instantiate(selectHighlight, c.gameCharacter);
+            c.selectedHighlight = temp;
+            c.SetSelected(false);
         }
     }
 

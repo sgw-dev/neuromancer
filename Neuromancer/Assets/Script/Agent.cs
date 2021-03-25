@@ -52,7 +52,7 @@ public class Agent : MonoBehaviour
 
     public void Health(int change)
     {
-        character.stats.health += change;
+        character.stats.health -= change;
         healthBar.ChangeHealth(Health());
     }
 
