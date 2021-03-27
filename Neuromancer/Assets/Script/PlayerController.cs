@@ -95,44 +95,31 @@ public class PlayerController : MonoBehaviour
                 {
                     if (surrounding.Contains(pointer.HexTile))
                     {
-                        bool isOnCharacter = false;
-                        List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
-                        foreach (Character c in allChars)
+                        HexTile startTile = htc.FindHex(activeChar.gameCharacter.position);
+                        List<int> path = Search.GreedySearch(startTile, pointer.HexTile, htc);
+                        List<Vector3> moves = new List<Vector3>();
+                        if (path.Count > 0)
                         {
-                            if (c.gameCharacter.position.Equals(pointer.HexTile.Position))
+                            moves.Add(startTile.nexts[path[0]].Position);
+                            for (int i = 1; i < path.Count; i++)
                             {
-                                isOnCharacter = true;
-                            }
-                        }
-                        if (!isOnCharacter)
-                        {
-                            HexTile startTile = htc.FindHex(activeChar.gameCharacter.position);
-                            List<int> path = Search.GreedySearch(startTile, pointer.HexTile, htc);
-                            List<Vector3> moves = new List<Vector3>();
-                            if (path.Count > 0)
-                            {
-                                moves.Add(startTile.nexts[path[0]].Position);
-                                for (int i = 1; i < path.Count; i++)
-                                {
-                                    int neighbor = path[i];
-                                    moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
+                                int neighbor = path[i];
+                                moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
 
-                                }
                             }
-                            Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
-                            GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
-                            activeChar.SetSelected(true, doneHighlight);
-                            moving = false;
-                            inSecondarySelect = false;
-                            ButtonCover.SetActive(true);
-                            CancelButton.SetActive(false);
-                            pointer.SetCanHighlight(true);
-                            foreach (HexTile ht in surrounding)
-                                ht.setHighlight(false);
                         }
+                        Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
+                        GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                        activeChar.SetSelected(true, doneHighlight);
+                        moving = false;
+                        inSecondarySelect = false;
+                        ButtonCover.SetActive(true);
+                        CancelButton.SetActive(false);
+                        pointer.SetCanHighlight(true);
+                        foreach (HexTile ht in surrounding)
+                            ht.setHighlight(false);
                     }
                     //DebugCharacters();
-
                 }
             }
             if (attacking)
@@ -141,16 +128,7 @@ public class PlayerController : MonoBehaviour
                 {
                     if (surrounding.Contains(pointer.HexTile))
                     {
-                        bool isOnCharacter = false;
-                        List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
-                        foreach (Character c in allChars)
-                        {
-                            if (c.gameCharacter.position.Equals(pointer.HexTile.Position))
-                            {
-                                isOnCharacter = true;
-                            }
-                        }
-                        if (isOnCharacter)
+                        if (IsOnCharatcer(pointer.HexTile.Position))
                         {
                             Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, pointer.HexTile.Position);
                             GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
@@ -190,35 +168,17 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public List<HexTile> ValidateRadius(HexTile startTile, List<HexTile> group)
+    public bool IsOnCharatcer(Vector3 position)
     {
-        List<HexTile> result = new List<HexTile>();
         List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
-        foreach (HexTile hex in group)
+        foreach (Character c in allChars)
         {
-            bool canMoveThere = true;
-            foreach (Character c in allChars)
+            if (c.gameCharacter.position.Equals(position))
             {
-                if (c.gameCharacter.position.Equals(hex.Position))
-                {
-                    canMoveThere = false;
-                }
+                return true;
             }
-            if (hex.IsObstacle)
-            {
-                canMoveThere = false;
-            }
-            if (canMoveThere)
-            {
-                List<int> path = Search.GreedySearch(startTile, hex, htc);
-                if(path.Count <= activeChar.stats.speed)
-                {
-                    result.Add(hex);
-                }
-            }
-            
         }
-        return result;
+        return false;
     }
 
     public void DebugCharacters()
@@ -263,7 +223,7 @@ public class PlayerController : MonoBehaviour
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
         surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed);
-        surrounding = ValidateRadius(htc.FindHex(activeChar.gameCharacter.position), surrounding);
+        surrounding = Search.ValidateRadius(htc.FindHex(activeChar.gameCharacter.position), surrounding, activeChar.stats.speed, GameSystem.CurrentGame().AllCharacters(), htc);
         foreach (HexTile ht in surrounding)
             ht.setHighlight(true);
     }

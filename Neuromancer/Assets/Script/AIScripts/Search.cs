@@ -79,6 +79,34 @@ public static class Search
 
     }
 
+    public static List<HexTile> ValidateRadius(HexTile startTile, List<HexTile> group, int steps, List<Character> allChars, HexTileController htc)
+    {
+        List<HexTile> result = new List<HexTile>();
+        foreach (HexTile hex in group)
+        {
+            if (!IsOnCharatcer(hex.Position, allChars) && !hex.IsObstacle)
+            {
+                List<int> path = Search.GreedySearch(startTile, hex, htc);
+                if (path.Count <= steps)
+                {
+                    result.Add(hex);
+                }
+            }
+        }
+        return result;
+    }
+    private static bool IsOnCharatcer(Vector3 position, List<Character> allChars)
+    {
+        foreach (Character c in allChars)
+        {
+            if (c.gameCharacter.position.Equals(position))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static List<int> GreedySearch(HexTile start, HexTile end, HexTileController htc)
     {
         List<HexTile> closeSet = new List<HexTile>();
