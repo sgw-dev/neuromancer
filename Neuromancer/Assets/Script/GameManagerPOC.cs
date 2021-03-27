@@ -99,7 +99,7 @@ public class GameManagerPOC : MonoBehaviour
                         break;
                     case CharacterClass.RANGED:
                         c.stats.health = 5;
-                        c.stats.speed = 5;//*** Should not be this high!, should be 2****
+                        c.stats.speed = 2;
                         c.stats.range = 5;
                         c.stats.attackdmg = 4;
                         break;

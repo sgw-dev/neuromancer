@@ -190,6 +190,37 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public List<HexTile> ValidateRadius(HexTile startTile, List<HexTile> group)
+    {
+        List<HexTile> result = new List<HexTile>();
+        List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
+        foreach (HexTile hex in group)
+        {
+            bool canMoveThere = true;
+            foreach (Character c in allChars)
+            {
+                if (c.gameCharacter.position.Equals(hex.Position))
+                {
+                    canMoveThere = false;
+                }
+            }
+            if (hex.IsObstacle)
+            {
+                canMoveThere = false;
+            }
+            if (canMoveThere)
+            {
+                List<int> path = Search.GreedySearch(startTile, hex, htc);
+                if(path.Count <= activeChar.stats.speed)
+                {
+                    result.Add(hex);
+                }
+            }
+            
+        }
+        return result;
+    }
+
     public void DebugCharacters()
     {
         Debug.Log("***Character States ***");
@@ -231,7 +262,8 @@ public class PlayerController : MonoBehaviour
 
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
-        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed, true);
+        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed);
+        surrounding = ValidateRadius(htc.FindHex(activeChar.gameCharacter.position), surrounding);
         foreach (HexTile ht in surrounding)
             ht.setHighlight(true);
     }
