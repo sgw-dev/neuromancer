@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class Search
@@ -33,21 +34,19 @@ public static class Search
     }
     public static MiniAction DecideAction(GameState gameState, HexTileController htc)
     {
-        int radius = gameState.selfChar.stats.range;
+        int attackRadius = gameState.selfChar.stats.range;
         // **** Spencer Notes ******
-        /*  Could possible imporve this by checking if any of the 4 player
-         *  Characters are in range for an attack, instead of checking every hex
-         *  in range for a character.
-         *  
-         *  Note: Had to do this since ai was attacking its own team
+        /*  If you can attack, do
+         *  Else evaluate all the locations you could possible move to, 
+         *  then take the largest and move to it
          */
-        List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, radius);
+        List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, attackRadius);
         Character closestChar = null;
         int closestDistance = int.MaxValue;
         foreach (Character character in gameState.playerChars)
         {
             int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
-            if (distance <= radius && distance < closestDistance)
+            if (distance <= attackRadius && distance < closestDistance)
             {
                 closestDistance = distance;
                 closestChar = character;
@@ -58,25 +57,41 @@ public static class Search
             return new MiniAttack() { type="Attack", toAttack = closestChar};
         }
         // **** Spencer Notes ******
-        /* Could not find anything to attack so move towards the closest player character
+        /* Could not find anything to attack so move to the best possible location
          */
-        HexTile destTile = null;
-        closestDistance = int.MaxValue;
-        foreach (Character character in gameState.playerChars)
-        {
-            int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
-            if (distance < closestDistance)
-            {
-                closestDistance = distance;
-                destTile = htc.FindHex(character.gameCharacter.position);
-            }
-        }
-        if (closestDistance < int.MaxValue)
-        {
-            return new MiniMove() { type = "Move", Dest = destTile };
-        }
-        return new MiniAction() { type = "fail"};
 
+        List<HexTile> possibleMoves = htc.FindRadius(gameState.selfTile, gameState.selfChar.stats.speed);
+        possibleMoves = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, gameState.aiChars.Concat(gameState.playerChars).ToList(), htc);
+        PriorityQueue fringe = new PriorityQueue();
+        foreach (HexTile hex in possibleMoves)
+        {
+            GameState gs = new GameState(gameState.aiChars, gameState.playerChars, hex, gameState.selfChar);
+            fringe.Push((hex, null), EvaluateState(gs, htc));
+        }
+
+        if (!fringe.HasNext())
+        {
+            //No avialable moves, move to self
+            return new MiniMove() { type = "Move", Dest = gameState.selfTile };
+        }
+        (HexTile state, List<int> actions) = fringe.Pop();
+        return new MiniMove() { type = "Move", Dest = state };
+
+
+    }
+    public static float EvaluateState(GameState gameState, HexTileController htc)
+    {
+        float inAttackRange = 0;//Bounis if you can attach characters
+        float distanceToEnemy = 0;//Minimise this
+        foreach(Character c in gameState.playerChars)
+        {
+            float distance = htc.FindHexDistance(gameState.selfTile.Position, c.gameCharacter.position);
+            if (distance <= c.stats.range)
+                inAttackRange += 5;
+            distanceToEnemy += distance;
+        }
+        //distanceToEnemy = 1/Mathf.Max(0, distanceToEnemy);
+        return distanceToEnemy;
     }
 
     public static List<HexTile> ValidateRadius(HexTile startTile, List<HexTile> group, int steps, List<Character> allChars, HexTileController htc)
@@ -114,8 +129,8 @@ public static class Search
 
         fringe.Push((start, new List<int>()), 0);
 
-        int sentinel = 100;
-        
+        int sentinel = 200;
+        //Greedy search is limited to 200 iterations to find goal
         while (fringe.HasNext() && sentinel > 0){
             (HexTile state, List<int> actions) = fringe.Pop();
             if (state.Position.Equals(end.Position))
@@ -165,7 +180,7 @@ public static class Search
     
     public class PriorityQueue
     {
-        
+        //**** This is a min Q !!! ***
         private List<Pair> list;
         public PriorityQueue()
         {
@@ -174,7 +189,7 @@ public static class Search
         public void Push((HexTile, List<int>) item, float cost)
         {
             list.Add(new Pair(item, cost));
-            list.Sort((a, b) => a.cost.CompareTo(b.cost));
+            list.Sort((a, b) => a.CompareTo(b));
         }
         public bool HasNext()
         {
@@ -187,7 +202,7 @@ public static class Search
             return p.item;
         }
 
-        private class Pair
+        public class Pair
         {
             public (HexTile, List<int>) item;
             public float cost;
@@ -195,6 +210,11 @@ public static class Search
             {
                 item = i;
                 cost = c;
+            }
+            public int CompareTo(Pair p)
+            {
+                
+                return cost.CompareTo(p.cost);
             }
         }
     }

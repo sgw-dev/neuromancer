@@ -37,68 +37,90 @@ public class AIMover : MonoBehaviour
         if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
             if(!started)
-                StartCoroutine(MoveCharacters()); 
+                StartCoroutine(MoveAllCharacters()); 
         }
     }
-    private IEnumerator MoveCharacters()
+    private IEnumerator MoveAllCharacters()
     {
         started = true;
         //If it is my turn, I am players[0] and the enemy is players[1]
         Player enemyPlayer = GameSystem.CurrentGame().Players()[1];
         List<Character> myChars = new List<Character>(player.characters.Values);
-        List<Character> enemyChars = new List<Character>(enemyPlayer.characters.Values);
+        
         //Move Charatcers in order of Melee, Hacker, sniper, psyonic
-        foreach (Character character in myChars)
+        if(MoveCharacter(CharacterClass.MELEE, myChars, enemyPlayer))
         {
-            GameState gameState = new GameState(myChars, enemyChars, htc.FindHex(character.gameCharacter.position), character);
-            MiniAction miniAction = Search.DecideAction(gameState, htc);
-            //Debug.Log(character.name+" will "+miniAction.type);
-
-            switch (miniAction.type)
-            {
-                case "Move":
-                    HexTile startTile = htc.FindHex(character.gameCharacter.position);
-                    MiniMove move = miniAction as MiniMove;
-                    List<int> path = Search.GreedySearch(startTile, move.Dest, htc);
-                    //Path ends on the destination (the enemy player), remove the last element
-                    //Because we can't move ontop of a player
-                    //Only send the first few steps
-                    int speed = character.stats.speed;
-                    //Debug.Log("Path before : " + printArray(path));
-                    List<Vector3> moves = new List<Vector3>();
-                    if (path.Count > 0)
-                    {
-                        path = TrimPath(path, speed);
-                        //Debug.Log("Path after : " + printArray(path));
-                        moves.Add(startTile.nexts[path[0]].Position);
-                        for (int i = 1; i < path.Count; i++)
-                        {
-                            int neighbor = path[i];
-                            moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
-
-                        }
-                    }
-                    else
-                    {
-                        moves.Add(character.gameCharacter.position);
-                    }
-
-                    //Debug.Log("Moving to " + moves[moves.Count - 1]);
-                    //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
-                    Action a = MoveActionFactory.getInstance().CreateAction(character, moves.ToArray());
-                    GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
-
-                    //StartCoroutine(Move(character.gameCharacter.gameObject, path, 0.5f));
-                    break;
-                case "Attack":
-                    break;
-            }
             yield return new WaitForSecondsRealtime(1.5f);
         }
+        if (MoveCharacter(CharacterClass.HACKER, myChars, enemyPlayer))
+        {
+            yield return new WaitForSecondsRealtime(1.5f);
+        }
+        if (MoveCharacter(CharacterClass.RANGED, myChars, enemyPlayer))
+        {
+            yield return new WaitForSecondsRealtime(1.5f);
+        }
+        if (MoveCharacter(CharacterClass.PSYONIC, myChars, enemyPlayer))
+        {
+            yield return new WaitForSecondsRealtime(1.5f);
+        }
+
         //End the AI's turn
-        yield return new WaitForSecondsRealtime(0.5f);
         EndMyTurn();
         started = false;
+    }
+    private bool MoveCharacter(CharacterClass charClass, List<Character> myChars, Player enemyPlayer)
+    {
+        Character activeChar = null;
+        foreach(Character c in myChars)
+        {
+            if (c.characterclass == charClass)
+                activeChar = c;
+        }
+        if (activeChar == null)
+            return false;
+
+        List<Character> enemyChars = new List<Character>(enemyPlayer.characters.Values);
+        GameState gameState = new GameState(myChars, enemyChars, htc.FindHex(activeChar.gameCharacter.position), activeChar);
+
+        MiniAction miniAction = Search.DecideAction(gameState, htc);
+        //Debug.Log(character.name+" will "+miniAction.type);
+
+        switch (miniAction.type)
+        {
+            case "Move":
+                HexTile startTile = htc.FindHex(activeChar.gameCharacter.position);
+                MiniMove move = miniAction as MiniMove;
+                
+                List<int> path = Search.GreedySearch(startTile, move.Dest, htc);
+                //Path ends on the tile you want to move to
+                List<Vector3> moves = new List<Vector3>();
+                if (path.Count > 0)
+                {
+                    moves.Add(startTile.nexts[path[0]].Position);
+                    for (int i = 1; i < path.Count; i++)
+                    {
+                        int neighbor = path[i];
+                        moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
+                    }
+                }
+                else
+                {
+                    moves.Add(activeChar.gameCharacter.position);
+                }
+
+                Debug.Log(activeChar.name+" is Moving to " + moves[moves.Count - 1]);
+                //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
+
+                Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
+                GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+
+                //StartCoroutine(Move(character.gameCharacter.gameObject, path, 0.5f));
+                break;
+            case "Attack":
+                break;
+        }
+        return true;
     }
     public void EndMyTurn()
     {
