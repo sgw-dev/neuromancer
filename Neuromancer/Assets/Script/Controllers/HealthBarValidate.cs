@@ -22,7 +22,7 @@ public class HealthBarValidate : MonoBehaviour
         UpdateWidth();
     }
 
-    /*
+    #if UNITY_EDITOR
     public void OnValidate()
     {
         if (Application.isPlaying)
@@ -39,7 +39,7 @@ public class HealthBarValidate : MonoBehaviour
             catch { }
         };
     }
-    */
+    #endif
 
     public void MoveHandle(float precent)
     {
