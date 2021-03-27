@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -17,6 +18,7 @@ public class PlayerController : MonoBehaviour
 
     public GameObject PlayerButtons;
     public GameObject ButtonCover;
+    public Button EndTurnButton;
 
     public GameObject CancelButton;
 
@@ -44,6 +46,7 @@ public class PlayerController : MonoBehaviour
         //If it is my turn
         if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
         {
+            EndTurnButton.interactable = true;
             myChars = new List<Character>(player.characters.Values);
             //Debug.Log("I see " + myChars.Count + " Characters");
             if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
@@ -77,6 +80,7 @@ public class PlayerController : MonoBehaviour
                             c.SetSelected(false);
                         }
                     }
+                    //DebugCharacters();
                     if (activeChar != null)
                     {
                         
@@ -91,31 +95,44 @@ public class PlayerController : MonoBehaviour
                 {
                     if (surrounding.Contains(pointer.HexTile))
                     {
-                        HexTile startTile = htc.FindHex(activeChar.gameCharacter.position);
-                        List<int> path = Search.GreedySearch(startTile, pointer.HexTile, htc);
-                        List<Vector3> moves = new List<Vector3>();
-                        if (path.Count > 0)
+                        bool isOnCharacter = false;
+                        List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
+                        foreach (Character c in allChars)
                         {
-                            moves.Add(startTile.nexts[path[0]].Position);
-                            for (int i = 1; i < path.Count; i++)
+                            if (c.gameCharacter.position.Equals(pointer.HexTile.Position))
                             {
-                                int neighbor = path[i];
-                                moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
-
+                                isOnCharacter = true;
                             }
                         }
-                        Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
-                        GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
-                        activeChar.SetSelected(true, doneHighlight);
-                        moving = false;
-                        inSecondarySelect = false;
-                        ButtonCover.SetActive(true);
-                        CancelButton.SetActive(false);
-                        pointer.SetCanHighlight(true);
-                        foreach (HexTile ht in surrounding)
-                            ht.setHighlight(false);
+                        if (!isOnCharacter)
+                        {
+                            HexTile startTile = htc.FindHex(activeChar.gameCharacter.position);
+                            List<int> path = Search.GreedySearch(startTile, pointer.HexTile, htc);
+                            List<Vector3> moves = new List<Vector3>();
+                            if (path.Count > 0)
+                            {
+                                moves.Add(startTile.nexts[path[0]].Position);
+                                for (int i = 1; i < path.Count; i++)
+                                {
+                                    int neighbor = path[i];
+                                    moves.Add(htc.FindHex(moves[i - 1]).nexts[path[i]].Position);
+
+                                }
+                            }
+                            Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
+                            GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                            activeChar.SetSelected(true, doneHighlight);
+                            moving = false;
+                            inSecondarySelect = false;
+                            ButtonCover.SetActive(true);
+                            CancelButton.SetActive(false);
+                            pointer.SetCanHighlight(true);
+                            foreach (HexTile ht in surrounding)
+                                ht.setHighlight(false);
+                        }
                     }
-                    
+                    //DebugCharacters();
+
                 }
             }
             if (attacking)
@@ -145,7 +162,8 @@ public class PlayerController : MonoBehaviour
                             pointer.SetCanHighlight(true);
                             foreach (HexTile ht in surrounding)
                                 ht.setHighlight(false);
-                        }                        
+                        }
+                        //DebugCharacters();
                     }
 
                 }
@@ -162,23 +180,36 @@ public class PlayerController : MonoBehaviour
             }
             if (allDone)
             {
-                PlayerButtons.SetActive(false);
-                foreach (Character character in myChars)
-                {
-                    character.SetSelected(false);
-                }
-                activeChar = null;
-                pointer.SetCanHighlight(true);
                 EndMyTurn();
             }
-            
+
+        }
+        else
+        {
+            EndTurnButton.interactable = false;
         }
     }
 
+    public void DebugCharacters()
+    {
+        Debug.Log("***Character States ***");
+        foreach (Character character in myChars)
+        {
+            Debug.Log(character.name + " has taken it's action? " + character.ActionTakenThisTurn);
+        }
+        Debug.Log("--------------------");
+    }
 
     public void EndMyTurn() 
     {
         GameSystem.CurrentGame().EndTurn(player);
+        PlayerButtons.SetActive(false);
+        foreach (Character character in myChars)
+        {
+            character.SetSelected(false);
+        }
+        activeChar = null;
+        pointer.SetCanHighlight(true);
     }
     public void Wait()
     {
