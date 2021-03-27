@@ -9,7 +9,7 @@ public class GameManagerPOC : MonoBehaviour
     public GameSystem gameSystem;
 
     [Tooltip("Put in order of the enum")]
-    public Sprite[] sprites;
+    public RuntimeAnimatorController[] animators;
 
     public GameObject characterPrefab;
     public GameObject enemyHighlight;
@@ -64,7 +64,10 @@ public class GameManagerPOC : MonoBehaviour
         Camera.main.GetComponent<AIMover>().player = player2;
 
         Material sprites_default = new Material(Shader.Find("Sprites/Default"));;
-        
+
+        //Parker
+        int animCounter = 0;
+
         //create the actual sprites and tie the scripts to gameobjects
         for(int i = 0 ; i < gameSystem.Players().Count; i++) 
         {
@@ -113,9 +116,14 @@ public class GameManagerPOC : MonoBehaviour
 
                 //put the sprite onto
                 SpriteRenderer renderer = tmp.AddComponent<SpriteRenderer>();
-                renderer.sprite=sprites[(int)c.characterclass];
+                //renderer.sprite=sprites[(int)c.characterclass];
                 renderer.material = sprites_default;
-                
+
+                //Parker
+                Animator anim = tmp.AddComponent<Animator>();
+                anim.runtimeAnimatorController = animators[animCounter];
+                animCounter++;
+
                 //hide until ready
                 renderer.enabled = false;
                 
