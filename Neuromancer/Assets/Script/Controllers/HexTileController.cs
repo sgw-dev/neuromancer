@@ -99,7 +99,7 @@ public class HexTileController : MonoBehaviour
         }
         list.Add(current);
 
-        if (checkObstacle && current.IsObstacle)
+        if (checkObstacle && (current.IsObstacle || current.HoldingObject != null))
         {
             FindRadius(current.nexts[dir], ref list, radius - 2, dir, checkObstacle);
         }
