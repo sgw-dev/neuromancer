@@ -3628,6 +3628,10 @@ MonoBehaviour:
   PlayerButtons: {fileID: 1711625369}
   ButtonCover: {fileID: 713686669}
   CancelButton: {fileID: 972325697}
+  defaultHighlight: {r: 0.48584908, g: 1, b: 0.49371082, a: 1}
+  attackHighlight: {r: 1, g: 0.3915094, b: 0.3915094, a: 1}
+  moveHighlight: {r: 0.4009434, g: 0.5567718, b: 1, a: 1}
+  doneHighlight: {r: 0.7264151, g: 0.7264151, b: 0.7264151, a: 1}
 --- !u!4 &1954906485
 Transform:
   m_ObjectHideFlags: 0
