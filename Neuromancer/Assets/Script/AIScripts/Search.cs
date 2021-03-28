@@ -81,17 +81,32 @@ public static class Search
     }
     public static float EvaluateState(GameState gameState, HexTileController htc)
     {
-        float inAttackRange = 0;//Bounis if you can attach characters
+        //Data is going into a MinQ, smaller number is better
+        float inAttackRange = 0;//Bounis if you can attack characters
         float distanceToEnemy = 0;//Minimise this
+        float enemyCanAttack = 0;//Minimise this (large is bad)
         foreach(Character c in gameState.playerChars)
         {
             float distance = htc.FindHexDistance(gameState.selfTile.Position, c.gameCharacter.position);
-            if (distance <= c.stats.range)
-                inAttackRange += 5;
+            //If you can attack this player character
+            if (distance <= gameState.selfChar.stats.range)
+                //Bigger number is better, (you are subtracting this later)
+                // You want to be able to attack the player, but only just. (Incase you have a longer range then them).
+                // The enemy has a range of 5, you are 5 tiles away (and can attack) = good (1)
+                // The enemy has a range of 5, you are 1 tile away = worst (.2)
+                // The enemy has a range of 2, you are 3 tiles away = great (1.5)
+                inAttackRange += distance / c.stats.range;
+            else if (distance <= c.stats.range)
+                //If the enemy can attack you, but you can't attack them, this is bad
+                //Only slight penality, don't want the AI to be scared
+                enemyCanAttack += .25f;
             distanceToEnemy += distance;
         }
-        //distanceToEnemy = 1/Mathf.Max(0, distanceToEnemy);
-        return distanceToEnemy;
+        //This is a MinQ, smaller is better!!!!
+        /* Minimise distance to enemys (get into attack range), 
+        * subtract inAttackRange(you get bounises for being able to attack a character)
+        * */
+        return distanceToEnemy - inAttackRange + enemyCanAttack;
     }
 
     public static List<HexTile> ValidateRadius(HexTile startTile, List<HexTile> group, int steps, List<Character> allChars, HexTileController htc)
