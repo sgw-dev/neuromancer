@@ -52,14 +52,20 @@ public class AIMover : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(1.5f);
         }
+        enemyPlayer = GameSystem.CurrentGame().Players()[1];
+        myChars = new List<Character>(player.characters.Values);
         if (MoveCharacter(CharacterClass.HACKER, myChars, enemyPlayer))
         {
             yield return new WaitForSecondsRealtime(1.5f);
         }
+        enemyPlayer = GameSystem.CurrentGame().Players()[1];
+        myChars = new List<Character>(player.characters.Values);
         if (MoveCharacter(CharacterClass.RANGED, myChars, enemyPlayer))
         {
             yield return new WaitForSecondsRealtime(1.5f);
         }
+        enemyPlayer = GameSystem.CurrentGame().Players()[1];
+        myChars = new List<Character>(player.characters.Values);
         if (MoveCharacter(CharacterClass.PSYONIC, myChars, enemyPlayer))
         {
             yield return new WaitForSecondsRealtime(1.5f);
@@ -112,12 +118,15 @@ public class AIMover : MonoBehaviour
                 Debug.Log(activeChar.name+" is Moving to " + moves[moves.Count - 1]);
                 //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
 
-                Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
-                GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                Action m = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
+                GameSystem.CurrentGame().ExecuteCharacterAction(player, m);
 
                 //StartCoroutine(Move(character.gameCharacter.gameObject, path, 0.5f));
                 break;
             case "Attack":
+                MiniAttack attack = miniAction as MiniAttack;
+                Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, attack.toAttack.gameCharacter.position);
+                GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
                 break;
         }
         return true;
