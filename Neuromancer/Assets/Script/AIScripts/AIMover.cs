@@ -46,43 +46,72 @@ public class AIMover : MonoBehaviour
         //If it is my turn, I am players[0] and the enemy is players[1]
         Player enemyPlayer = GameSystem.CurrentGame().Players()[1];
         List<Character> myChars = new List<Character>(player.characters.Values);
-        
+
+        yield return new WaitForSecondsRealtime(0.5f);
         //Move Charatcers in order of Melee, Hacker, sniper, psyonic
-        if(MoveCharacter(CharacterClass.MELEE, myChars, enemyPlayer))
+        // *** Melee ***
+        Character activeChar = GetChar(myChars, CharacterClass.MELEE);
+        if (activeChar != null)
         {
-            yield return new WaitForSecondsRealtime(1.5f);
+            activeChar.SetSelected(true);
+            yield return new WaitForSecondsRealtime(0.5f);
+            MoveCharacter(activeChar, myChars, enemyPlayer);
+            yield return new WaitForSecondsRealtime(0.5f);
+            activeChar.SetSelected(false);
         }
+        // *** Hacker ***
         enemyPlayer = GameSystem.CurrentGame().Players()[1];
         myChars = new List<Character>(player.characters.Values);
-        if (MoveCharacter(CharacterClass.HACKER, myChars, enemyPlayer))
+        activeChar = GetChar(myChars, CharacterClass.HACKER);
+        if (activeChar != null)
         {
-            yield return new WaitForSecondsRealtime(1.5f);
+            activeChar.SetSelected(true);
+            yield return new WaitForSecondsRealtime(0.5f);
+            MoveCharacter(activeChar, myChars, enemyPlayer);
+            yield return new WaitForSecondsRealtime(0.5f);
+            activeChar.SetSelected(false);
         }
+        // *** Sniper ***
         enemyPlayer = GameSystem.CurrentGame().Players()[1];
         myChars = new List<Character>(player.characters.Values);
-        if (MoveCharacter(CharacterClass.RANGED, myChars, enemyPlayer))
+        activeChar = GetChar(myChars, CharacterClass.RANGED);
+        if (activeChar != null)
         {
-            yield return new WaitForSecondsRealtime(1.5f);
+            activeChar.SetSelected(true);
+            yield return new WaitForSecondsRealtime(0.5f);
+            MoveCharacter(activeChar, myChars, enemyPlayer);
+            yield return new WaitForSecondsRealtime(0.5f);
+            activeChar.SetSelected(false);
         }
+        // *** Psyonic ***
         enemyPlayer = GameSystem.CurrentGame().Players()[1];
         myChars = new List<Character>(player.characters.Values);
-        if (MoveCharacter(CharacterClass.PSYONIC, myChars, enemyPlayer))
+        activeChar = GetChar(myChars, CharacterClass.PSYONIC);
+        if (activeChar != null)
         {
-            yield return new WaitForSecondsRealtime(1.5f);
+            activeChar.SetSelected(true);
+            yield return new WaitForSecondsRealtime(0.5f);
+            MoveCharacter(activeChar, myChars, enemyPlayer);
+            yield return new WaitForSecondsRealtime(0.5f);
+            activeChar.SetSelected(false);
         }
 
         //End the AI's turn
         EndMyTurn();
         started = false;
     }
-    private bool MoveCharacter(CharacterClass charClass, List<Character> myChars, Player enemyPlayer)
+    private Character GetChar(List<Character> myChars, CharacterClass charClass)
     {
         Character activeChar = null;
-        foreach(Character c in myChars)
+        foreach (Character c in myChars)
         {
             if (c.characterclass == charClass)
                 activeChar = c;
         }
+        return activeChar;
+    }
+    private bool MoveCharacter(Character activeChar, List<Character> myChars, Player enemyPlayer)
+    {
         if (activeChar == null)
             return false;
 
