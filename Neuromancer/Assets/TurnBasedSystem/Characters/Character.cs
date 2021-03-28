@@ -36,5 +36,10 @@ public class Character : IComparable {
     {
         selectedHighlight.SetActive(active);
     }
+    public void SetSelected(bool active, Color color)
+    {
+        selectedHighlight.SetActive(active);
+        selectedHighlight.GetComponent<SpriteRenderer>().color = color;
+    }
 
 }
