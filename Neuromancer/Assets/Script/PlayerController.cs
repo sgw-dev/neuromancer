@@ -137,7 +137,7 @@ public class PlayerController : MonoBehaviour
                         }
                         foreach (HexTile ht in surrounding)
                             ht.setHighlight(true);
-                        subSelect = htc.FindRadius(pointer.HexTile, 2);
+                        subSelect = htc.FindRadius(pointer.HexTile, activeChar.stats.aoeRange);
                         foreach (HexTile ht in subSelect)
                             ht.setHighlight(true, hackerAttack);
                     }
@@ -250,6 +250,13 @@ public class PlayerController : MonoBehaviour
         Action a = MoveActionFactory.getInstance().CreateAction(activeChar, activeChar.gameCharacter.position);
         GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
         ButtonCover.SetActive(true);
+        foreach (HexTile ht in surrounding)
+            ht.setHighlight(false);
+        foreach (HexTile ht in subSelect)
+            ht.setHighlight(false);
+        inSecondarySelect = false;
+        moving = false;
+        attacking = false;
     }
 
     public void Move()
