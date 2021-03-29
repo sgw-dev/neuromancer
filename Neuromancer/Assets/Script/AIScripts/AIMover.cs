@@ -157,6 +157,11 @@ public class AIMover : MonoBehaviour
                 Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, attack.toAttack.gameCharacter.position);
                 GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
                 break;
+            case "AOEAttack":
+                MiniAttack aoeAttack = miniAction as MiniAttack;
+                Action aoeA = AttackActionFactory.GetInstance().CreateAction(activeChar, aoeAttack.attackLocation);
+                GameSystem.CurrentGame().ExecuteCharacterAction(player, aoeA);
+                break;
         }
         return true;
     }

@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
         PlayerButtons.SetActive(false);
         CancelButton.SetActive(false);
         surrounding = new List<HexTile>();
+        subSelect = new List<HexTile>();
     }
 
     
@@ -261,7 +262,7 @@ public class PlayerController : MonoBehaviour
         activeChar.SetSelected(true, moveHighlight);
 
         pointer.SetCanHighlight(false);
-
+        
         foreach (HexTile ht in subSelect)
             ht.setHighlight(false);
         foreach (HexTile ht in surrounding)

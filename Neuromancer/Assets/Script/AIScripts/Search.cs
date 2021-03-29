@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TurnBasedSystem;
 using UnityEngine;
 
 public static class Search
@@ -27,6 +28,7 @@ public static class Search
     public class MiniAttack : MiniAction
     {
         public Character toAttack;
+        public Vector3 attackLocation;
     }
     public class MiniMove : MiniAction
     {
@@ -40,7 +42,28 @@ public static class Search
          *  Else evaluate all the locations you could possible move to, 
          *  then take the largest and move to it
          */
-        List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, attackRadius);
+        //If this character is the hacker, find best possible place to put the attack
+        if(gameState.selfChar.characterclass == CharacterClass.MELEE)
+        {
+            List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, attackRadius);
+            PriorityQueue attackFringe = new PriorityQueue();
+            foreach (HexTile hex in attackRange)
+            {
+                GameState gs = new GameState(gameState.aiChars, gameState.playerChars, hex, gameState.selfChar);
+                float value = EvaluateAOEAttackState(gs, htc);
+                //If this attack will do more damage to yourself, don't add it to the list
+                if(value > 0)
+                    attackFringe.Push((hex, null), value);
+            }
+            //If there is nothing in the list (No good attacks) Move intead
+            if (attackFringe.HasNext())
+            {
+                (HexTile attackHex, List<int> a) = attackFringe.Pop();
+                return new MiniAttack() { type = "AOEAttack", attackLocation = attackHex.Position };
+            }
+            
+        }
+        
         Character closestChar = null;
         int closestDistance = int.MaxValue;
         foreach (Character character in gameState.playerChars)
@@ -61,7 +84,8 @@ public static class Search
          */
 
         List<HexTile> possibleMoves = htc.FindRadius(gameState.selfTile, gameState.selfChar.stats.speed);
-        possibleMoves = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, gameState.aiChars.Concat(gameState.playerChars).ToList(), htc);
+        List<Character> allChars = gameState.aiChars.Concat(gameState.playerChars).ToList();
+        possibleMoves = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, allChars, htc);
         PriorityQueue fringe = new PriorityQueue();
         foreach (HexTile hex in possibleMoves)
         {
@@ -78,6 +102,28 @@ public static class Search
         return new MiniMove() { type = "Move", Dest = state };
 
 
+    }
+    public static float EvaluateAOEAttackState(GameState gameState, HexTileController htc)
+    {
+        //Data is going into a MinQ, smaller number is better
+        float aiHealthLost = 0;
+        float playerLost = 0;
+        List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, 2);
+        foreach(Character c in gameState.aiChars)
+        {
+            if (attackRange.Contains(htc.FindHex(c.gameCharacter.position)))
+            {
+                aiHealthLost += gameState.selfChar.stats.attackdmg;
+            }
+        }
+        foreach (Character c in gameState.playerChars)
+        {
+            if (attackRange.Contains(htc.FindHex(c.gameCharacter.position)))
+            {
+                playerLost += gameState.selfChar.stats.attackdmg;
+            }
+        }
+        return playerLost - aiHealthLost;
     }
     public static float EvaluateState(GameState gameState, HexTileController htc)
     {
