@@ -30,7 +30,7 @@ public class AttackAction : TurnBasedSystem.Action
         {
             //deals AOE
             ///2 is hard coded, in future replace with a character class variable
-            List<Character> inarea = GetAllInAOERange(attackedtile,2);
+            List<Character> inarea = GetAllInAOERange(attackedtile,takenby.stats.aoeRange);
             foreach(Character c in inarea)
             {
                 //c.stats.health += damage;

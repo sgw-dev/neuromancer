@@ -30,6 +30,10 @@ public class Agent : MonoBehaviour
     {
         return character.stats.health;
     }
+    public int MaxHealth()
+    {
+        return character.stats.maxHealth;
+    }
 
     public int Energy()
     {
@@ -49,7 +53,6 @@ public class Agent : MonoBehaviour
     {
         return character.stats.range;
     }
-
     public void Health(int change)
     {
         character.stats.health -= change;

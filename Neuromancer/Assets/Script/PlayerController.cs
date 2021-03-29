@@ -23,9 +23,11 @@ public class PlayerController : MonoBehaviour
     public GameObject CancelButton;
 
     private List<HexTile> surrounding;
+    private List<HexTile> subSelect;
 
     public Color defaultHighlight;
     public Color attackHighlight;
+    public Color hackerAttack;
     public Color moveHighlight;
     public Color doneHighlight;
 
@@ -38,6 +40,7 @@ public class PlayerController : MonoBehaviour
         PlayerButtons.SetActive(false);
         CancelButton.SetActive(false);
         surrounding = new List<HexTile>();
+        subSelect = new List<HexTile>();
     }
 
     
@@ -124,10 +127,40 @@ public class PlayerController : MonoBehaviour
             }
             if (attacking)
             {
+                if (activeChar.characterclass == CharacterClass.HACKER)
+                {
+                    if (surrounding.Contains(pointer.HexTile))
+                    {
+                        if (subSelect != null) { 
+                            foreach (HexTile ht in subSelect)
+                                ht.setHighlight(false);
+                        }
+                        foreach (HexTile ht in surrounding)
+                            ht.setHighlight(true);
+                        subSelect = htc.FindRadius(pointer.HexTile, activeChar.stats.aoeRange);
+                        foreach (HexTile ht in subSelect)
+                            ht.setHighlight(true, hackerAttack);
+                    }
+                }
                 if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
                 {
                     if (surrounding.Contains(pointer.HexTile))
                     {
+                        if(activeChar.characterclass == CharacterClass.HACKER)
+                        {
+                            Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, pointer.HexTile.Position);
+                            GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                            activeChar.SetSelected(true, doneHighlight);
+                            attacking = false;
+                            inSecondarySelect = false;
+                            ButtonCover.SetActive(true);
+                            CancelButton.SetActive(false);
+                            pointer.SetCanHighlight(true);
+                            foreach (HexTile ht in surrounding)
+                                ht.setHighlight(false);
+                            foreach (HexTile ht in subSelect)
+                                ht.setHighlight(false);
+                        }
                         if (IsOnCharatcer(pointer.HexTile.Position))
                         {
                             Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, pointer.HexTile.Position);
@@ -199,6 +232,16 @@ public class PlayerController : MonoBehaviour
         {
             character.SetSelected(false);
         }
+        if (surrounding != null)
+        {
+            foreach (HexTile ht in surrounding)
+                ht.setHighlight(false);
+        }
+        if (subSelect != null)
+        {
+            foreach (HexTile ht in subSelect)
+                ht.setHighlight(false);
+        }
         activeChar = null;
         pointer.SetCanHighlight(true);
     }
@@ -207,6 +250,13 @@ public class PlayerController : MonoBehaviour
         Action a = MoveActionFactory.getInstance().CreateAction(activeChar, activeChar.gameCharacter.position);
         GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
         ButtonCover.SetActive(true);
+        foreach (HexTile ht in surrounding)
+            ht.setHighlight(false);
+        foreach (HexTile ht in subSelect)
+            ht.setHighlight(false);
+        inSecondarySelect = false;
+        moving = false;
+        attacking = false;
     }
 
     public void Move()
@@ -219,7 +269,9 @@ public class PlayerController : MonoBehaviour
         activeChar.SetSelected(true, moveHighlight);
 
         pointer.SetCanHighlight(false);
-
+        
+        foreach (HexTile ht in subSelect)
+            ht.setHighlight(false);
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
         surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed);
@@ -246,9 +298,16 @@ public class PlayerController : MonoBehaviour
     {
         CancelButton.SetActive(false);
         inSecondarySelect = false;
+        attacking = false;
+        moving = false;
         if(surrounding != null)
         {
             foreach (HexTile ht in surrounding)
+                ht.setHighlight(false);
+        }
+        if (subSelect != null)
+        {
+            foreach (HexTile ht in subSelect)
                 ht.setHighlight(false);
         }
         pointer.SetCanHighlight(true);

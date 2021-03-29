@@ -72,7 +72,7 @@ namespace TurnBasedSystem {
             
 
             turn++;
-            Debug.Log(endingturn.name + " turn end.");
+            //Debug.Log(endingturn.name + " turn end.");
 
             //add player back to queue
             players.Enqueue(endingturn);

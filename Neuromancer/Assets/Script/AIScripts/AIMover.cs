@@ -144,7 +144,7 @@ public class AIMover : MonoBehaviour
                     moves.Add(activeChar.gameCharacter.position);
                 }
 
-                Debug.Log(activeChar.name+" is Moving to " + moves[moves.Count - 1]);
+                //Debug.Log(activeChar.name+" is Moving to " + moves[moves.Count - 1]);
                 //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
 
                 Action m = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
@@ -156,6 +156,11 @@ public class AIMover : MonoBehaviour
                 MiniAttack attack = miniAction as MiniAttack;
                 Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, attack.toAttack.gameCharacter.position);
                 GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                break;
+            case "AOEAttack":
+                MiniAttack aoeAttack = miniAction as MiniAttack;
+                Action aoeA = AttackActionFactory.GetInstance().CreateAction(activeChar, aoeAttack.attackLocation);
+                GameSystem.CurrentGame().ExecuteCharacterAction(player, aoeA);
                 break;
         }
         return true;
