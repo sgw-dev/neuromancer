@@ -6,7 +6,7 @@ namespace TurnBasedSystem {
     public class GameSystem {
 
         public static GameSystem currentGame; 
-
+        public List<Player> playersWithNoCharacters;
         int             turn;        //indicates the round
         Queue<Player>   players;     //set of players
         
@@ -23,7 +23,8 @@ namespace TurnBasedSystem {
          */
         public GameSystem(params Player[] all)     
         {
-
+            
+            playersWithNoCharacters = new List<Player>();
             turn = 0;
             players = new Queue<Player>();
 
@@ -117,9 +118,31 @@ namespace TurnBasedSystem {
 
             //otherwise take the action
             bool success = totake.Execute();
+            //check the game to see if a player has lost
             if(success)
             {
-                // totake.TakenBy().ActionTakenThisTurn = true;
+
+                // totake.TakenBy().ActionTakenThisTurn = true;   
+                
+                //get all the players character counts
+                foreach( Player chkp in Players() ) {
+                    int count = CharacterCount(chkp);
+                    if(count <= 0) {
+                        playersWithNoCharacters.Add(chkp);
+                    }
+                }
+
+                //check it it is a tie
+                if(players.Count == playersWithNoCharacters.Count) {
+                    GameObject.Find("WinCondition").GetComponent<GameOver>().Tie();
+                } 
+                else if(playersWithNoCharacters.Count > 0)  {
+                    GameOver go = GameObject.Find("WinCondition").GetComponent<GameOver>();
+                    foreach (Player pded in playersWithNoCharacters) {
+                        go.GameOverFor(pded);
+                    }
+                }
+
                 return true;
             }
             return false;
@@ -174,6 +197,11 @@ namespace TurnBasedSystem {
                 //character will die after the .1f seconds
                 //GameObject.Destroy(c.gameCharacter.gameObject);
             }
+        }
+
+        public int CharacterCount(Player p)
+        {
+            return p.characters.Count;
         }
 
         #if UNITY_EDITOR
