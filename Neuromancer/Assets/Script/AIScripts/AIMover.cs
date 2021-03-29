@@ -144,7 +144,7 @@ public class AIMover : MonoBehaviour
                     moves.Add(activeChar.gameCharacter.position);
                 }
 
-                Debug.Log(activeChar.name+" is Moving to " + moves[moves.Count - 1]);
+                //Debug.Log(activeChar.name+" is Moving to " + moves[moves.Count - 1]);
                 //Action a = MoveActionFactory.getInstance().CreateAction(character, moves[moves.Count-1]);
 
                 Action m = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());

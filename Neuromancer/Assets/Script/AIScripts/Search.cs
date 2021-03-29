@@ -43,7 +43,7 @@ public static class Search
          *  then take the largest and move to it
          */
         //If this character is the hacker, find best possible place to put the attack
-        if(gameState.selfChar.characterclass == CharacterClass.MELEE)
+        if (gameState.selfChar.characterclass == CharacterClass.HACKER)
         {
             List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, attackRadius);
             PriorityQueue attackFringe = new PriorityQueue();
@@ -52,7 +52,7 @@ public static class Search
                 GameState gs = new GameState(gameState.aiChars, gameState.playerChars, hex, gameState.selfChar);
                 float value = EvaluateAOEAttackState(gs, htc);
                 //If this attack will do more damage to yourself, don't add it to the list
-                if(value > 0)
+                if (value > 0)
                     attackFringe.Push((hex, null), value);
             }
             //If there is nothing in the list (No good attacks) Move intead
@@ -61,24 +61,92 @@ public static class Search
                 (HexTile attackHex, List<int> a) = attackFringe.Pop();
                 return new MiniAttack() { type = "AOEAttack", attackLocation = attackHex.Position };
             }
-            
+
         }
-        
-        Character closestChar = null;
-        int closestDistance = int.MaxValue;
-        foreach (Character character in gameState.playerChars)
+        else if (gameState.selfChar.characterclass == CharacterClass.PSYONIC)
         {
-            int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
-            if (distance <= attackRadius && distance < closestDistance)
+            Character needestChar = null;
+            Character cantReachChar = null;
+            float cantReachHealth = 1;
+            float leastHealth = 1;
+            foreach (Character character in gameState.aiChars)
             {
-                closestDistance = distance;
-                closestChar = character;
+                if (character.CompareTo(gameState.selfChar) != 0)
+                {
+                    int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
+                    float health = character.stats.health / character.stats.maxHealth;
+                    //If you can heal the character, and the health is less than 1
+                    if (health < leastHealth)
+                    {
+                        if(distance <= attackRadius)
+                        {
+                            leastHealth = health;
+                            needestChar = character;
+                        }
+                        else
+                        {
+                            cantReachHealth = health;
+                            cantReachChar = character;
+                        }
+                        
+                    }
+                }
+            }
+            if (leastHealth < 1)
+            {
+                return new MiniAttack() { type = "Attack", toAttack = needestChar };
+            }else if(cantReachHealth < 1)
+            {
+                //If there is a character in need that you can't reach, move towards it
+                Debug.Log("Healer Moving towards " + cantReachChar.name);
+                HexTile toMovTo = MoveTowards(cantReachChar, gameState, htc, true);
+                return new MiniMove() { type = "Move", Dest = toMovTo };
+            }
+            else
+            {
+                //Can't heal yourself*******
+                //Move towards the Ranger
+                Character target = GetCharacter(gameState.aiChars, CharacterClass.RANGED);
+                if(target != null)
+                {
+                    HexTile toMovTo = MoveTowards(target, gameState, htc, true);
+                    return new MiniMove() { type = "Move", Dest = toMovTo };
+                }
+                target = GetCharacter(gameState.aiChars, CharacterClass.HACKER);
+                if (target != null)
+                {
+                    HexTile toMovTo = MoveTowards(target, gameState, htc, true);
+                    return new MiniMove() { type = "Move", Dest = toMovTo };
+                }
+                target = GetCharacter(gameState.aiChars, CharacterClass.MELEE);
+                if (target != null)
+                {
+                    HexTile toMovTo = MoveTowards(target, gameState, htc, true);
+                    return new MiniMove() { type = "Move", Dest = toMovTo };
+                }
+                //No other characters but you exist, await the sweet release of death
+                return new MiniMove() { type = "Move", Dest = gameState.selfTile };
             }
         }
-        if(closestDistance < int.MaxValue)
+        else
         {
-            return new MiniAttack() { type="Attack", toAttack = closestChar};
+            Character closestChar = null;
+            int closestDistance = int.MaxValue;
+            foreach (Character character in gameState.playerChars)
+            {
+                int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
+                if (distance <= attackRadius && distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestChar = character;
+                }
+            }
+            if (closestDistance < int.MaxValue)
+            {
+                return new MiniAttack() { type = "Attack", toAttack = closestChar };
+            }
         }
+
         // **** Spencer Notes ******
         /* Could not find anything to attack so move to the best possible location
          */
@@ -103,12 +171,100 @@ public static class Search
 
 
     }
+    public static Character GetCharacter(List<Character> list, CharacterClass cClass)
+    {
+        Character character = null;
+        foreach(Character c in list)
+        {
+            if (c.characterclass == cClass)
+                character = c;
+        }
+        return character;
+    }
+    public static HexTile MoveTowards(Character target, GameState gameState, HexTileController htc, bool runFromEnemy = false)
+    {
+        /*List<HexTile> possibleMoves = htc.FindRadius(gameState.selfTile, gameState.selfChar.stats.speed);
+        List<Character> allChars = gameState.aiChars.Concat(gameState.playerChars).ToList();
+        possibleMoves = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, allChars, htc);
+        HexTile dest = gameState.selfTile;
+        int closest = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, target.gameCharacter.position);
+        foreach(HexTile hex in possibleMoves)
+        {
+            int newDist = htc.FindHexDistance(hex.Position, target.gameCharacter.position);
+            if(newDist < closest)
+            {
+                closest = newDist;
+                dest = hex;
+            }
+        }
+        return dest;*/
+        //choose the tile you want to move to, either the character directly, or a tile next to the character that is away from the enemy
+        HexTile targetTile = htc.FindHex(target.gameCharacter.position);
+        if (runFromEnemy)
+        {
+            List<HexTile> tilesAroundTarget = htc.FindRadius(targetTile, 1);
+            int farthest = 0;
+            foreach (HexTile hexTile in tilesAroundTarget)
+            {
+                if (!hexTile.IsObstacle && hexTile.HoldingObject == null)
+                {
+                    //Find distance to all player characters
+                    int newDist = 0;
+                    foreach (Character c in gameState.playerChars)
+                    {
+                        newDist += htc.FindHexDistance(hexTile.Position, c.gameCharacter.position);
+                    }
+                    //You want the distance to the player to be largest
+                    if (newDist > farthest)
+                    {
+                        farthest = newDist;
+                        targetTile = hexTile;
+                    }
+                }
+            }
+        }
+        List<int> moves = GreedySearch(gameState.selfTile, targetTile, htc);
+
+        //If run from enemy is false, your target in ON a character, so remove that last step
+        if (!runFromEnemy)
+        {
+            //Remove the last step (the one on the distination character)
+            if (moves.Count > 0)
+                moves.RemoveAt(moves.Count - 1);
+        }
+
+        Debug.Log("Psyonic wants to move ...");
+        foreach(int i in moves)
+        {
+            Debug.Log(i);
+        }
+        Debug.Log("To get to " + target.name);
+        
+        //If you were already right next to the target, don't go anywhere
+        if (moves.Count == 0)
+            return gameState.selfTile;
+        //Only keep the number of steps that you are allowed to move
+        //Starting hex is your own
+        HexTile hex = gameState.selfTile;
+        //Repet until you hit your step count, or you run out of moves
+        for (int i = 0; i < Mathf.Min(gameState.selfChar.stats.speed, moves.Count); i++)
+        {
+            //Get the neighbor that the path tells you too
+            hex = hex.nexts[moves[i]];
+        }
+        return hex;
+
+    }
+    public static float EvaluateHideState(GameState gameState, HexTileController htc)
+    {
+        return 0;
+    }
     public static float EvaluateAOEAttackState(GameState gameState, HexTileController htc)
     {
         //Data is going into a MinQ, smaller number is better
         float aiHealthLost = 0;
         float playerLost = 0;
-        List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, 2);
+        List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, gameState.selfChar.stats.aoeRange);
         foreach(Character c in gameState.aiChars)
         {
             if (attackRange.Contains(htc.FindHex(c.gameCharacter.position)))
