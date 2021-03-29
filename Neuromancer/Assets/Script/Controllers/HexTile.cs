@@ -9,12 +9,13 @@ public class HexTile : MonoBehaviour , IEquatable<HexTile>
     Vector3 position;
     [SerializeField] SpriteRenderer highlight;
     [SerializeField] Color red;
-
+    Color defaultColor;
     GameObject holdingObject = null;
     bool isObstacle;
 
     public void Start()
     {
+        defaultColor = highlight.color;
         highlight.enabled = false;
         transform.position = position;
     }
@@ -54,10 +55,20 @@ public class HexTile : MonoBehaviour , IEquatable<HexTile>
 
     public void setHighlight(bool b)
     {
+        if (isObstacle)
+            highlight.color = red;
+        else
+            highlight.color = defaultColor;
+
         highlight.enabled = b;
     }
 
     //By Spencer
+    public void setHighlight(bool b, Color c)
+    {
+        highlight.color = c;
+        highlight.enabled = b;
+    }
     public bool Equals(HexTile other)
     {
         return Position.Equals(other.position);
