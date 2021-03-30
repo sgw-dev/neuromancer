@@ -187,7 +187,7 @@ namespace TurnBasedSystem {
             return currentGame;
         }
 
-        public void CheckDeath(Character c,Player p)
+        public bool CheckDeath(Character c,Player p)
         {   
             if(c.stats.health <= 0) 
             {
@@ -196,7 +196,9 @@ namespace TurnBasedSystem {
                 mfd.Setup(1f);
                 //character will die after the .1f seconds
                 //GameObject.Destroy(c.gameCharacter.gameObject);
+                return true;
             }
+            return false;
         }
 
         public int CharacterCount(Player p)
