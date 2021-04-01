@@ -138,15 +138,30 @@ public static class Search
         else
         {
             Character weakestChar = null;
+            Character deadChar = null;
             float leastHealth = int.MaxValue;
             foreach (Character character in gameState.playerChars)
             {
                 int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
-                if (distance <= attackRadius && (character.stats.health/character.stats.maxHealth) < leastHealth)
+                
+                if (distance <= attackRadius)
                 {
-                    leastHealth = (character.stats.health / character.stats.maxHealth);
-                    weakestChar = character;
+                    //If your attack would kill this character, target this one above all else
+                    if ((Mathf.Max(0, character.stats.health - gameState.selfChar.stats.attackdmg) / character.stats.maxHealth) <= 0)
+                    {
+                        deadChar = character;
+                    }
+                    if ((character.stats.health / character.stats.maxHealth) < leastHealth)
+                    {
+                        leastHealth = (character.stats.health / character.stats.maxHealth);
+                        weakestChar = character;
+                    }
                 }
+            }
+            //Attack the soon to be dead character if it can
+            if(deadChar != null)
+            {
+                return new MiniAttack() { type = "Attack", toAttack = deadChar };
             }
             if (weakestChar != null)
             {
