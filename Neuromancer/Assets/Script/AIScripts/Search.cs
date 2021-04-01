@@ -160,7 +160,11 @@ public static class Search
 
         List<HexTile> possibleMoves = htc.FindRadius(gameState.selfTile, gameState.selfChar.stats.speed);
         List<Character> allChars = gameState.aiChars.Concat(gameState.playerChars).ToList();
-        possibleMoves = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, allChars, htc);
+        List<(HexTile, List<int>)> possibleMoves2 = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, allChars, htc);
+        //possibleMoves = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, allChars, htc);
+        possibleMoves = new List<HexTile>();
+        foreach ((HexTile hex, List<int> path) in possibleMoves2)
+            possibleMoves.Add(hex);
         PriorityQueue fringe = new PriorityQueue();
         foreach (HexTile hex in possibleMoves)
         {
@@ -307,22 +311,23 @@ public static class Search
         return distanceToEnemy - inAttackRange + enemyCanAttack;
     }
 
-    public static List<HexTile> ValidateRadius(HexTile startTile, List<HexTile> group, int steps, List<Character> allChars, HexTileController htc)
+    public static List<(HexTile, List<int>)> ValidateRadius(HexTile startTile, List<HexTile> group, int steps, List<Character> allChars, HexTileController htc)
     {
-        List<HexTile> result = new List<HexTile>();
+        List<(HexTile, List<int>)> result = new List<(HexTile, List<int>)>();
         foreach (HexTile hex in group)
         {
             if (!IsOnCharatcer(hex.Position, allChars) && !hex.IsObstacle)
             {
                 List<int> path = Search.GreedySearch(startTile, hex, htc);
-                if (path.Count <= steps)
+                if (path.Count <= steps && path.Count > 0)
                 {
-                    result.Add(hex);
+                    result.Add((hex, path));
                 }
             }
         }
         return result;
     }
+
     private static bool IsOnCharatcer(Vector3 position, List<Character> allChars)
     {
         foreach (Character c in allChars)
@@ -342,7 +347,7 @@ public static class Search
 
         fringe.Push((start, new List<int>()), 0);
 
-        int sentinel = 500;
+        int sentinel = 200;
         //Greedy search is limited to 200 iterations to find goal
         while (fringe.HasNext() && sentinel > 0){
             (HexTile state, List<int> actions) = fringe.Pop();
