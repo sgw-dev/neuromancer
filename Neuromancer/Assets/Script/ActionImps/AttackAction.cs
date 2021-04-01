@@ -24,8 +24,10 @@ public class AttackAction : TurnBasedSystem.Action
 
     void Attack()
     {
-
         HexTile attackedtile = htc.FindHex(space);
+        //parker
+        takenby.gameCharacter.GetComponent<Agent>().SpawnProjectile(attackedtile.Position);
+
         if(takenby.characterclass.Equals(CharacterClass.HACKER))
         {
             //deals AOE

@@ -10,5 +10,4 @@ public class PredefinedTestCharacterStats : ScriptableObject {
 	public int energy;
 	public int speed;
 	public int character_class;
-	
 }
