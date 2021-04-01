@@ -9,8 +9,8 @@ public class Agent : MonoBehaviour
     public Character character;
     public HexTile   currentlyOn;
 
-    
     public HealthBar healthBar;
+    public Projectile projectile;
 
     public void Start()
     {
@@ -25,6 +25,13 @@ public class Agent : MonoBehaviour
         //probably animate characters here
     }
 
+    //parker
+    public void SpawnProjectile(Vector3 targetPos)
+    {
+        Projectile tmp = Instantiate(projectile, Vector3.zero, Quaternion.identity).GetComponent<Projectile>();
+        tmp.InstantiateProjectile(currentlyOn.Position, targetPos);
+
+    }
 
     public int Health()
     {
@@ -71,4 +78,8 @@ public class Agent : MonoBehaviour
         character.stats.attackdmg += change;
     }
 
+    public void Projectile(Projectile p)
+    {
+        projectile = p;
+    }
 }

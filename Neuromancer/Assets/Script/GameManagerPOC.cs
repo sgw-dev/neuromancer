@@ -9,7 +9,13 @@ public class GameManagerPOC : MonoBehaviour
     public GameSystem gameSystem;
 
     [Tooltip("Put in order of the enum")]
+    //melee
+    //ranged
+    //psyonic
+    //hacker
     public RuntimeAnimatorController[] animators;
+    public Material material;
+    public Projectile[] projectiles;
 
     public GameObject characterPrefab;
     public GameObject enemyHighlight;
@@ -63,7 +69,7 @@ public class GameManagerPOC : MonoBehaviour
         //assign the player script to the AI player
         Camera.main.GetComponent<AIMover>().player = player2;
 
-        Material sprites_default = new Material(Shader.Find("Sprites/Default"));;
+        //Material sprites_default = new Material(Shader.Find("Sprites/Default"));;
 
         //Parker
         int animCounter = 0;
@@ -117,12 +123,14 @@ public class GameManagerPOC : MonoBehaviour
                 //put the sprite onto
                 SpriteRenderer renderer = tmp.AddComponent<SpriteRenderer>();
                 //renderer.sprite=sprites[(int)c.characterclass];
-                renderer.material = sprites_default;
+                renderer.material = material;
 
                 //Parker
                 Animator anim = tmp.AddComponent<Animator>();
                 anim.runtimeAnimatorController = animators[animCounter];
                 animCounter++;
+
+                ctmp.Projectile(projectiles[(int)c.characterclass]);
 
                 //hide until ready
                 renderer.enabled = false;
