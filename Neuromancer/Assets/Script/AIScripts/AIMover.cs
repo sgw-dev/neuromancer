@@ -34,7 +34,7 @@ public class AIMover : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
+        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name) && GameSystem.CurrentGame().GameState == TerminalGameState.PLAYING)
         {
             if(!started)
                 StartCoroutine(MoveAllCharacters()); 
