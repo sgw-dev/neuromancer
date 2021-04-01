@@ -23,7 +23,10 @@ public class PlayerController : MonoBehaviour
     public GameObject CancelButton;
 
     private List<HexTile> surrounding;
+    private List<(HexTile, List<int>)> surrounding2;
     private List<HexTile> subSelect;
+
+    public MoveDebug MD;
 
     public Color defaultHighlight;
     public Color attackHighlight;
@@ -40,6 +43,7 @@ public class PlayerController : MonoBehaviour
         PlayerButtons.SetActive(false);
         CancelButton.SetActive(false);
         surrounding = new List<HexTile>();
+        surrounding2 = new List<(HexTile, List<int>)>();
         subSelect = new List<HexTile>();
     }
 
@@ -121,6 +125,7 @@ public class PlayerController : MonoBehaviour
                         pointer.SetCanHighlight(true);
                         foreach (HexTile ht in surrounding)
                             ht.setHighlight(false);
+                        MD.ClearAll();
                     }
                     //DebugCharacters();
                 }
@@ -243,6 +248,9 @@ public class PlayerController : MonoBehaviour
                 ht.setHighlight(false);
         }
         activeChar = null;
+        inSecondarySelect = false;
+        attacking = false;
+        moving = false;
         pointer.SetCanHighlight(true);
     }
     public void Wait()
@@ -275,9 +283,16 @@ public class PlayerController : MonoBehaviour
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
         surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed);
-        surrounding = Search.ValidateRadius(htc.FindHex(activeChar.gameCharacter.position), surrounding, activeChar.stats.speed, GameSystem.CurrentGame().AllCharacters(), htc);
+        surrounding2 = Search.ValidateRadius(htc.FindHex(activeChar.gameCharacter.position), surrounding, activeChar.stats.speed, GameSystem.CurrentGame().AllCharacters(), htc);
+        surrounding = new List<HexTile>();
+        MD.ClearAll();
+        foreach ((HexTile hex, List<int> path) in surrounding2)
+        {
+            MD.SetText(hex, path);
+            surrounding.Add(hex);
+        }
         foreach (HexTile ht in surrounding)
-            ht.setHighlight(true);
+           ht.setHighlight(true);
     }
     public void Attack() {
         CancelButton.SetActive(true);

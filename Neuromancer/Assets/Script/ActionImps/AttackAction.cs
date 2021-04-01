@@ -38,28 +38,34 @@ public class AttackAction : TurnBasedSystem.Action
                 Debug.Log(c.name + " takes " + damage);
                 foreach(Player p in GameSystem.CurrentGame().Players())
                 {
-                    GameSystem.CurrentGame().CheckDeath(c,p);
+                    if (GameSystem.CurrentGame().CheckDeath(c, p))
+                    {
+                        htc.FindHex(c.gameCharacter.position).SetObject(null, false);
+                    }
                 }
             }
         } 
         // else 
         // {//deal damage to single object
-            if(attackedtile.HoldingObject != null)
-            {
-                Agent totakedamage = attackedtile.HoldingObject.GetComponent<Agent>();
+        if(attackedtile.HoldingObject != null)
+        {
+            Agent totakedamage = attackedtile.HoldingObject.GetComponent<Agent>();
                 
-                if(totakedamage != null) 
+            if(totakedamage != null) 
+            {
+                totakedamage.Health(damage);
+                Debug.Log(totakedamage.character.name + " takes " + damage);
+                foreach(Player p in GameSystem.CurrentGame().Players())
                 {
-                    totakedamage.Health(damage);
-                    Debug.Log(totakedamage.character.name + " takes " + damage);
-                    foreach(Player p in GameSystem.CurrentGame().Players())
+                    if (GameSystem.CurrentGame().CheckDeath(totakedamage.character, p))
                     {
-                        GameSystem.CurrentGame().CheckDeath(totakedamage.character,p);
+                        htc.FindHex(totakedamage.character.gameCharacter.position).SetObject(null, false);
                     }
-
                 }
 
             }
+
+        }
         // }
         
     }
