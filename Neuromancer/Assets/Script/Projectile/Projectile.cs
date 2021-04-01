@@ -19,9 +19,9 @@ public class Projectile : MonoBehaviour
         Destroy(this.gameObject);
     }
 
-    public void RotateToTarget()
+    public void RotateToTarget(Vector3 dir)
     {
-        float angle = Vector3.SignedAngle(Vector3.right, targetPos - startPos, Vector3.forward);
+        float angle = Vector3.SignedAngle(dir, targetPos - startPos, Vector3.forward);
         transform.rotation = Quaternion.Euler(0, 0, angle);
     }
 }

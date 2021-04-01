@@ -11,10 +11,20 @@ public class Bullet : Projectile
     {
         base.InstantiateProjectile(sp, tp);
         float dis = Vector3.Distance(sp, tp);
-        StartCoroutine(SelfDestruct(dis / speed));
+
+        float time = dis / speed;
+        StartCoroutine(Stop(time));
+        StartCoroutine(SelfDestruct(time + 1));
+
         transform.position = sp;
-        RotateToTarget();
+        RotateToTarget(Vector3.right);
         velocity = transform.right * speed;
+    }
+
+    protected IEnumerator Stop(float time)
+    {
+        yield return new WaitForSeconds(time);
+        velocity = Vector3.zero;
     }
 
     public void Update()

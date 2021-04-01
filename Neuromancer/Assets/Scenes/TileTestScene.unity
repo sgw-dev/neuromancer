@@ -3908,8 +3908,8 @@ MonoBehaviour:
   projectiles:
   - {fileID: 75187557680562420, guid: 2d39df193ca8caf46a053b310b20f6dd, type: 3}
   - {fileID: 7888118529106818616, guid: c380716fe8c83924cbc27e5d46c77e8c, type: 3}
-  - {fileID: 3244607493026063343, guid: 3e058f585fa2abc428d61fbdca221d4a, type: 3}
   - {fileID: -918072081331577884, guid: 0dc2a87076383d940aea9c54329f28f7, type: 3}
+  - {fileID: 3244607493026063343, guid: 3e058f585fa2abc428d61fbdca221d4a, type: 3}
   characterPrefab: {fileID: 2912135822961881211, guid: 9ed31bbf570cf9f48a6259db729328f8,
     type: 3}
   enemyHighlight: {fileID: 3223690191786905878, guid: 3a801ac7793e31d4dabd84a2b5c685ba,

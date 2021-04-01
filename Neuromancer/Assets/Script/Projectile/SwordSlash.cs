@@ -9,7 +9,7 @@ public class SwordSlash : Projectile
     {
         base.InstantiateProjectile(sp, tp);
         StartCoroutine(SelfDestruct(duration));
-        RotateToTarget();
+        RotateToTarget(Vector3.up);
         transform.position = sp;
     }
 }
