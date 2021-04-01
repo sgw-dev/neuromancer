@@ -243,6 +243,9 @@ public class PlayerController : MonoBehaviour
                 ht.setHighlight(false);
         }
         activeChar = null;
+        inSecondarySelect = false;
+        attacking = false;
+        moving = false;
         pointer.SetCanHighlight(true);
     }
     public void Wait()

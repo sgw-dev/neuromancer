@@ -58,7 +58,14 @@ public static class Search
             //If there is nothing in the list (No good attacks) Move intead
             if (attackFringe.HasNext())
             {
-                (HexTile attackHex, List<int> a) = attackFringe.Pop();
+                ((HexTile attackHex, List<int> a), float value) = attackFringe.PopWithVal();
+                //If this attack only did damage to 1 character (or 1 more than your own chars)
+                /* *** Come back if you have more time ****
+                if (value <= gameState.selfChar.stats.attackdmg)
+                {
+                    //Find see if there is a better place to attack and move to that spot
+
+                }*/
                 return new MiniAttack() { type = "AOEAttack", attackLocation = attackHex.Position };
             }
 
@@ -130,20 +137,20 @@ public static class Search
         }
         else
         {
-            Character closestChar = null;
-            int closestDistance = int.MaxValue;
+            Character weakestChar = null;
+            float leastHealth = int.MaxValue;
             foreach (Character character in gameState.playerChars)
             {
                 int distance = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, character.gameCharacter.position);
-                if (distance <= attackRadius && distance < closestDistance)
+                if (distance <= attackRadius && (character.stats.health/character.stats.maxHealth) < leastHealth)
                 {
-                    closestDistance = distance;
-                    closestChar = character;
+                    leastHealth = (character.stats.health / character.stats.maxHealth);
+                    weakestChar = character;
                 }
             }
-            if (closestDistance < int.MaxValue)
+            if (weakestChar != null)
             {
-                return new MiniAttack() { type = "Attack", toAttack = closestChar };
+                return new MiniAttack() { type = "Attack", toAttack = weakestChar };
             }
         }
 
@@ -183,21 +190,7 @@ public static class Search
     }
     public static HexTile MoveTowards(Character target, GameState gameState, HexTileController htc, bool runFromEnemy = false)
     {
-        /*List<HexTile> possibleMoves = htc.FindRadius(gameState.selfTile, gameState.selfChar.stats.speed);
-        List<Character> allChars = gameState.aiChars.Concat(gameState.playerChars).ToList();
-        possibleMoves = ValidateRadius(gameState.selfTile, possibleMoves, gameState.selfChar.stats.speed, allChars, htc);
-        HexTile dest = gameState.selfTile;
-        int closest = htc.FindHexDistance(gameState.selfChar.gameCharacter.position, target.gameCharacter.position);
-        foreach(HexTile hex in possibleMoves)
-        {
-            int newDist = htc.FindHexDistance(hex.Position, target.gameCharacter.position);
-            if(newDist < closest)
-            {
-                closest = newDist;
-                dest = hex;
-            }
-        }
-        return dest;*/
+
         //choose the tile you want to move to, either the character directly, or a tile next to the character that is away from the enemy
         HexTile targetTile = htc.FindHex(target.gameCharacter.position);
         if (runFromEnemy)
@@ -279,7 +272,10 @@ public static class Search
                 playerLost += gameState.selfChar.stats.attackdmg;
             }
         }
+
         return playerLost - aiHealthLost;
+        
+        
     }
     public static float EvaluateState(GameState gameState, HexTileController htc)
     {
@@ -346,7 +342,7 @@ public static class Search
 
         fringe.Push((start, new List<int>()), 0);
 
-        int sentinel = 200;
+        int sentinel = 500;
         //Greedy search is limited to 200 iterations to find goal
         while (fringe.HasNext() && sentinel > 0){
             (HexTile state, List<int> actions) = fringe.Pop();
@@ -367,7 +363,7 @@ public static class Search
                 bool validMove = false;
                 if(nextState != null)
                 {
-                    if(nextState.HoldingObject == null)
+                    if(nextState.HoldingObject == null && !nextState.IsObstacle)
                     {
                         validMove = true;
                     }else if (nextState.Position.Equals(end.Position))
@@ -417,6 +413,12 @@ public static class Search
             Pair p = list[0];
             list.RemoveAt(0);
             return p.item;
+        }
+        public ((HexTile, List<int>), float) PopWithVal()
+        {
+            Pair p = list[0];
+            list.RemoveAt(0);
+            return (p.item, p.cost);
         }
 
         public class Pair
