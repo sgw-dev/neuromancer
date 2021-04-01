@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TurnBasedSystem;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -17,10 +18,21 @@ public class PlayerController : MonoBehaviour
 
     public GameObject PlayerButtons;
     public GameObject ButtonCover;
+    public Button EndTurnButton;
 
     public GameObject CancelButton;
 
-    List<HexTile> surrounding;
+    private List<HexTile> surrounding;
+    private List<(HexTile, List<int>)> surrounding2;
+    private List<HexTile> subSelect;
+
+    public MoveDebug MD;
+
+    public Color defaultHighlight;
+    public Color attackHighlight;
+    public Color hackerAttack;
+    public Color moveHighlight;
+    public Color doneHighlight;
 
     [SerializeField]
     public List<Character> myChars;
@@ -31,14 +43,17 @@ public class PlayerController : MonoBehaviour
         PlayerButtons.SetActive(false);
         CancelButton.SetActive(false);
         surrounding = new List<HexTile>();
+        surrounding2 = new List<(HexTile, List<int>)>();
+        subSelect = new List<HexTile>();
     }
 
     
     void Update()
     {
         //If it is my turn
-        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
+        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name) && GameSystem.CurrentGame().GameState == TerminalGameState.PLAYING)
         {
+            EndTurnButton.interactable = true;
             myChars = new List<Character>(player.characters.Values);
             //Debug.Log("I see " + myChars.Count + " Characters");
             if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
@@ -54,15 +69,17 @@ public class PlayerController : MonoBehaviour
                         if (c.gameCharacter.position.Equals(pos))
                         {
                             activeChar = c;
-                            c.SetSelected(true);
+                            
                             PlayerButtons.SetActive(true);
                             if (activeChar.ActionTakenThisTurn)
                             {
                                 ButtonCover.SetActive(true);
+                                c.SetSelected(true, doneHighlight);
                             }
                             else
                             {
                                 ButtonCover.SetActive(false);
+                                c.SetSelected(true, defaultHighlight);
                             }
                         }
                         else
@@ -70,6 +87,7 @@ public class PlayerController : MonoBehaviour
                             c.SetSelected(false);
                         }
                     }
+                    //DebugCharacters();
                     if (activeChar != null)
                     {
                         
@@ -99,6 +117,7 @@ public class PlayerController : MonoBehaviour
                         }
                         Action a = MoveActionFactory.getInstance().CreateAction(activeChar, moves.ToArray());
                         GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                        activeChar.SetSelected(true, doneHighlight);
                         moving = false;
                         inSecondarySelect = false;
                         ButtonCover.SetActive(true);
@@ -106,29 +125,37 @@ public class PlayerController : MonoBehaviour
                         pointer.SetCanHighlight(true);
                         foreach (HexTile ht in surrounding)
                             ht.setHighlight(false);
+                        MD.ClearAll();
                     }
-                    
+                    //DebugCharacters();
                 }
             }
             if (attacking)
             {
+                if (activeChar.characterclass == CharacterClass.HACKER)
+                {
+                    if (surrounding.Contains(pointer.HexTile))
+                    {
+                        if (subSelect != null) { 
+                            foreach (HexTile ht in subSelect)
+                                ht.setHighlight(false);
+                        }
+                        foreach (HexTile ht in surrounding)
+                            ht.setHighlight(true);
+                        subSelect = htc.FindRadius(pointer.HexTile, activeChar.stats.aoeRange);
+                        foreach (HexTile ht in subSelect)
+                            ht.setHighlight(true, hackerAttack);
+                    }
+                }
                 if (Input.GetButtonDown("Fire1") && !EventSystem.current.IsPointerOverGameObject())
                 {
                     if (surrounding.Contains(pointer.HexTile))
                     {
-                        bool isOnCharacter = false;
-                        List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
-                        foreach (Character c in allChars)
-                        {
-                            if (c.gameCharacter.position.Equals(pointer.HexTile.Position))
-                            {
-                                isOnCharacter = true;
-                            }
-                        }
-                        if (isOnCharacter)
+                        if(activeChar.characterclass == CharacterClass.HACKER)
                         {
                             Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, pointer.HexTile.Position);
                             GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                            activeChar.SetSelected(true, doneHighlight);
                             attacking = false;
                             inSecondarySelect = false;
                             ButtonCover.SetActive(true);
@@ -136,7 +163,23 @@ public class PlayerController : MonoBehaviour
                             pointer.SetCanHighlight(true);
                             foreach (HexTile ht in surrounding)
                                 ht.setHighlight(false);
-                        }                        
+                            foreach (HexTile ht in subSelect)
+                                ht.setHighlight(false);
+                        }
+                        if (IsOnCharatcer(pointer.HexTile.Position))
+                        {
+                            Action a = AttackActionFactory.GetInstance().CreateAction(activeChar, pointer.HexTile.Position);
+                            GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
+                            activeChar.SetSelected(true, doneHighlight);
+                            attacking = false;
+                            inSecondarySelect = false;
+                            ButtonCover.SetActive(true);
+                            CancelButton.SetActive(false);
+                            pointer.SetCanHighlight(true);
+                            foreach (HexTile ht in surrounding)
+                                ht.setHighlight(false);
+                        }
+                        //DebugCharacters();
                     }
 
                 }
@@ -153,29 +196,75 @@ public class PlayerController : MonoBehaviour
             }
             if (allDone)
             {
-                PlayerButtons.SetActive(false);
-                foreach (Character character in myChars)
-                {
-                    character.SetSelected(false);
-                }
-                activeChar = null;
-                pointer.SetCanHighlight(true);
                 EndMyTurn();
             }
-            
+
+        }
+        else
+        {
+            EndTurnButton.interactable = false;
         }
     }
 
+    public bool IsOnCharatcer(Vector3 position)
+    {
+        List<Character> allChars = GameSystem.CurrentGame().AllCharacters();
+        foreach (Character c in allChars)
+        {
+            if (c.gameCharacter.position.Equals(position))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void DebugCharacters()
+    {
+        Debug.Log("***Character States ***");
+        foreach (Character character in myChars)
+        {
+            Debug.Log(character.name + " has taken it's action? " + character.ActionTakenThisTurn);
+        }
+        Debug.Log("--------------------");
+    }
 
     public void EndMyTurn() 
     {
         GameSystem.CurrentGame().EndTurn(player);
+        PlayerButtons.SetActive(false);
+        foreach (Character character in myChars)
+        {
+            character.SetSelected(false);
+        }
+        if (surrounding != null)
+        {
+            foreach (HexTile ht in surrounding)
+                ht.setHighlight(false);
+        }
+        if (subSelect != null)
+        {
+            foreach (HexTile ht in subSelect)
+                ht.setHighlight(false);
+        }
+        activeChar = null;
+        inSecondarySelect = false;
+        attacking = false;
+        moving = false;
+        pointer.SetCanHighlight(true);
     }
     public void Wait()
     {
         Action a = MoveActionFactory.getInstance().CreateAction(activeChar, activeChar.gameCharacter.position);
         GameSystem.CurrentGame().ExecuteCharacterAction(player, a);
         ButtonCover.SetActive(true);
+        foreach (HexTile ht in surrounding)
+            ht.setHighlight(false);
+        foreach (HexTile ht in subSelect)
+            ht.setHighlight(false);
+        inSecondarySelect = false;
+        moving = false;
+        attacking = false;
     }
 
     public void Move()
@@ -183,21 +272,42 @@ public class PlayerController : MonoBehaviour
         CancelButton.SetActive(true);
         inSecondarySelect = true;
         moving = true;
+        attacking = false;
+
+        activeChar.SetSelected(true, moveHighlight);
 
         pointer.SetCanHighlight(false);
-
-        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed, true);
+        
+        foreach (HexTile ht in subSelect)
+            ht.setHighlight(false);
         foreach (HexTile ht in surrounding)
-            ht.setHighlight(true);
+            ht.setHighlight(false);
+        surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.speed);
+        surrounding2 = Search.ValidateRadius(htc.FindHex(activeChar.gameCharacter.position), surrounding, activeChar.stats.speed, GameSystem.CurrentGame().AllCharacters(), htc);
+        surrounding = new List<HexTile>();
+        MD.ClearAll();
+        foreach ((HexTile hex, List<int> path) in surrounding2)
+        {
+            MD.SetText(hex, path);
+            surrounding.Add(hex);
+        }
+        foreach (HexTile ht in surrounding)
+           ht.setHighlight(true);
     }
     public void Attack() {
         CancelButton.SetActive(true);
         inSecondarySelect = true;
         attacking = true;
+        moving = false;
 
+        activeChar.SetSelected(true, attackHighlight);
         pointer.SetCanHighlight(false);
 
+        foreach (HexTile ht in surrounding)
+            ht.setHighlight(false);
         surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.range, false);
+        if(activeChar.characterclass == CharacterClass.HACKER)
+            surrounding.Add(htc.FindHex(activeChar.gameCharacter.position));
         foreach (HexTile ht in surrounding)
             ht.setHighlight(true);
     }
@@ -205,11 +315,19 @@ public class PlayerController : MonoBehaviour
     {
         CancelButton.SetActive(false);
         inSecondarySelect = false;
+        attacking = false;
+        moving = false;
         if(surrounding != null)
         {
             foreach (HexTile ht in surrounding)
                 ht.setHighlight(false);
         }
+        if (subSelect != null)
+        {
+            foreach (HexTile ht in subSelect)
+                ht.setHighlight(false);
+        }
         pointer.SetCanHighlight(true);
+        activeChar.SetSelected(true, defaultHighlight);
     }
 }

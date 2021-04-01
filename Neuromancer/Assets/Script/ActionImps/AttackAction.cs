@@ -32,34 +32,43 @@ public class AttackAction : TurnBasedSystem.Action
         {
             //deals AOE
             ///2 is hard coded, in future replace with a character class variable
-            List<Character> inarea = GetAllInAOERange(attackedtile,2);
+            List<Character> inarea = GetAllInAOERange(attackedtile,takenby.stats.aoeRange);
             foreach(Character c in inarea)
             {
-                c.stats.health += damage;
+                //c.stats.health += damage;
+                c.gameCharacter.GetComponent<Agent>().Health(damage);
+                Debug.Log(c.name + " takes " + damage);
                 foreach(Player p in GameSystem.CurrentGame().Players())
                 {
-                    GameSystem.CurrentGame().CheckDeath(c,p);
+                    if (GameSystem.CurrentGame().CheckDeath(c, p))
+                    {
+                        htc.FindHex(c.gameCharacter.position).SetObject(null, false);
+                    }
                 }
             }
         } 
-        else 
-        {//deal damage to single object
-            if(attackedtile.HoldingObject != null)
-            {
-                Agent totakedamage = attackedtile.HoldingObject.GetComponent<Agent>();
+        // else 
+        // {//deal damage to single object
+        if(attackedtile.HoldingObject != null)
+        {
+            Agent totakedamage = attackedtile.HoldingObject.GetComponent<Agent>();
                 
-                if(totakedamage != null) 
+            if(totakedamage != null) 
+            {
+                totakedamage.Health(damage);
+                Debug.Log(totakedamage.character.name + " takes " + damage);
+                foreach(Player p in GameSystem.CurrentGame().Players())
                 {
-                    totakedamage.Health(damage);
-                    foreach(Player p in GameSystem.CurrentGame().Players())
+                    if (GameSystem.CurrentGame().CheckDeath(totakedamage.character, p))
                     {
-                        GameSystem.CurrentGame().CheckDeath(totakedamage.character,p);
+                        htc.FindHex(totakedamage.character.gameCharacter.position).SetObject(null, false);
                     }
-
                 }
 
             }
+
         }
+        // }
         
     }
 
@@ -70,6 +79,10 @@ public class AttackAction : TurnBasedSystem.Action
         
         GameObject[] tmp =  Array.ConvertAll<HexTile,GameObject>(htc.FindRadius(tile,radius).ToArray(), t => t.HoldingObject);
         for(int i = 0 ; i < tmp.Length; i++ ){
+            if(tmp[i] == null)
+            {   
+                continue;
+            }
             Agent agent = tmp[i].GetComponent<Agent>();  
             if(agent != null) {
                 inrange.Add(agent.character);

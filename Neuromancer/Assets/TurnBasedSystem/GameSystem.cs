@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace TurnBasedSystem {
+    public enum TerminalGameState
+    {
+        PLAYING, WIN, LOSE, TIE
+    }
     public class GameSystem {
 
         public static GameSystem currentGame; 
-
+        public List<Player> playersWithNoCharacters;
         int             turn;        //indicates the round
         Queue<Player>   players;     //set of players
         
@@ -17,13 +21,16 @@ namespace TurnBasedSystem {
         List<Character> character_pool;
         public MonoBehaviour monoref;
 
+        private TerminalGameState gameState = TerminalGameState.PLAYING;
+
         /*
          * Initial Game Setup
          * Creates players
          */
         public GameSystem(params Player[] all)     
         {
-
+            
+            playersWithNoCharacters = new List<Player>();
             turn = 0;
             players = new Queue<Player>();
 
@@ -34,6 +41,10 @@ namespace TurnBasedSystem {
 
             currentGame = this;
 
+        }
+        public TerminalGameState GameState
+        {
+            get { return gameState; }
         }
 
         /*
@@ -72,7 +83,7 @@ namespace TurnBasedSystem {
             
 
             turn++;
-            Debug.Log(endingturn.name + " turn end.");
+            //Debug.Log(endingturn.name + " turn end.");
 
             //add player back to queue
             players.Enqueue(endingturn);
@@ -117,9 +128,40 @@ namespace TurnBasedSystem {
 
             //otherwise take the action
             bool success = totake.Execute();
+            //check the game to see if a player has lost
             if(success)
             {
-                // totake.TakenBy().ActionTakenThisTurn = true;
+
+                // totake.TakenBy().ActionTakenThisTurn = true;   
+                
+                //get all the players character counts
+                foreach( Player chkp in Players() ) {
+                    int count = CharacterCount(chkp);
+                    if(count <= 0) {
+                        playersWithNoCharacters.Add(chkp);
+                    }
+                }
+
+                //check it it is a tie
+                if(players.Count == playersWithNoCharacters.Count && gameState == TerminalGameState.PLAYING) {
+                    GameObject.Find("WinCondition").GetComponent<GameOver>().Tie();
+                    gameState = TerminalGameState.TIE;
+                } 
+                else if(playersWithNoCharacters.Count > 0)  {
+                    GameOver go = GameObject.Find("WinCondition").GetComponent<GameOver>();
+                    if (playersWithNoCharacters[0].name.Equals("PLAYER_2"))//the player wins
+                    {
+                        gameState = TerminalGameState.WIN;
+                    }
+                    else
+                    {
+                        gameState = TerminalGameState.LOSE;
+                    }
+                    foreach (Player pded in playersWithNoCharacters) {
+                        go.GameOverFor(pded);
+                    }
+                }
+
                 return true;
             }
             return false;
@@ -164,7 +206,7 @@ namespace TurnBasedSystem {
             return currentGame;
         }
 
-        public void CheckDeath(Character c,Player p)
+        public bool CheckDeath(Character c,Player p)
         {   
             if(c.stats.health <= 0) 
             {
@@ -173,7 +215,14 @@ namespace TurnBasedSystem {
                 mfd.Setup(1f);
                 //character will die after the .1f seconds
                 //GameObject.Destroy(c.gameCharacter.gameObject);
+                return true;
             }
+            return false;
+        }
+
+        public int CharacterCount(Player p)
+        {
+            return p.characters.Count;
         }
 
         #if UNITY_EDITOR

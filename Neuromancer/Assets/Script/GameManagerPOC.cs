@@ -95,27 +95,35 @@ public class GameManagerPOC : MonoBehaviour
                 switch (c.characterclass)
                 {
                     case CharacterClass.MELEE:
-                        c.stats.health = 10;
+                        c.stats.health = 14;
+                        c.stats.maxHealth = 14;
                         c.stats.speed = 3;
                         c.stats.range = 1;
-                        c.stats.attackdmg = 3;
+                        c.stats.aoeRange = 0;
+                        c.stats.attackdmg = 4;
                         break;
                     case CharacterClass.HACKER:
-                        c.stats.health = 5;
+                        c.stats.health = 7;
+                        c.stats.maxHealth = 7;
                         c.stats.speed = 2;
-                        c.stats.range = 3;
+                        c.stats.range = 4;
+                        c.stats.aoeRange = 1;
                         c.stats.attackdmg = 2;
                         break;
                     case CharacterClass.RANGED:
-                        c.stats.health = 5;
+                        c.stats.health = 7;
+                        c.stats.maxHealth = 7;
                         c.stats.speed = 2;
-                        c.stats.range = 5;
-                        c.stats.attackdmg = 4;
+                        c.stats.range = 4;
+                        c.stats.aoeRange = 0;
+                        c.stats.attackdmg = 3;
                         break;
                     case CharacterClass.PSYONIC:
-                        c.stats.health = 5;
-                        c.stats.speed = 2;
-                        c.stats.range = 2;
+                        c.stats.health = 7;
+                        c.stats.maxHealth = 7;
+                        c.stats.speed = 3;
+                        c.stats.range = 3;
+                        c.stats.aoeRange = 0;
                         c.stats.attackdmg = -2;
                         break;
                 }

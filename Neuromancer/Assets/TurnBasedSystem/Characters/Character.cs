@@ -25,7 +25,7 @@ public class Character : IComparable {
         if(!(obj is Character )){
             throw new Exception(obj+" is not comparable to Character");
         }
-        return ((Character)obj).stats.speed-stats.speed;
+        return ((Character)obj).name.CompareTo(name);
     }
 
     public void GetListOfActions() {
@@ -35,6 +35,11 @@ public class Character : IComparable {
     public void SetSelected(bool active)
     {
         selectedHighlight.SetActive(active);
+    }
+    public void SetSelected(bool active, Color color)
+    {
+        selectedHighlight.SetActive(active);
+        selectedHighlight.GetComponent<SpriteRenderer>().color = color;
     }
 
 }
