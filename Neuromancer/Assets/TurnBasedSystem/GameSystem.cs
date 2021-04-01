@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace TurnBasedSystem {
+    public enum TerminalGameState
+    {
+        PLAYING, WIN, LOSE, TIE
+    }
     public class GameSystem {
 
         public static GameSystem currentGame; 
@@ -16,6 +20,8 @@ namespace TurnBasedSystem {
         List<Action>    combinedActionsSet;
         List<Character> character_pool;
         public MonoBehaviour monoref;
+
+        private TerminalGameState gameState = TerminalGameState.PLAYING;
 
         /*
          * Initial Game Setup
@@ -35,6 +41,10 @@ namespace TurnBasedSystem {
 
             currentGame = this;
 
+        }
+        public TerminalGameState GameState
+        {
+            get { return gameState; }
         }
 
         /*
@@ -133,11 +143,20 @@ namespace TurnBasedSystem {
                 }
 
                 //check it it is a tie
-                if(players.Count == playersWithNoCharacters.Count) {
+                if(players.Count == playersWithNoCharacters.Count && gameState == TerminalGameState.PLAYING) {
                     GameObject.Find("WinCondition").GetComponent<GameOver>().Tie();
+                    gameState = TerminalGameState.TIE;
                 } 
                 else if(playersWithNoCharacters.Count > 0)  {
                     GameOver go = GameObject.Find("WinCondition").GetComponent<GameOver>();
+                    if (playersWithNoCharacters[0].name.Equals("PLAYER_2"))//the player wins
+                    {
+                        gameState = TerminalGameState.WIN;
+                    }
+                    else
+                    {
+                        gameState = TerminalGameState.LOSE;
+                    }
                     foreach (Player pded in playersWithNoCharacters) {
                         go.GameOverFor(pded);
                     }

@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         //If it is my turn
-        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name))
+        if (player.name.Equals(GameSystem.CurrentGame().WhosTurn().name) && GameSystem.CurrentGame().GameState == TerminalGameState.PLAYING)
         {
             EndTurnButton.interactable = true;
             myChars = new List<Character>(player.characters.Values);
@@ -306,6 +306,8 @@ public class PlayerController : MonoBehaviour
         foreach (HexTile ht in surrounding)
             ht.setHighlight(false);
         surrounding = htc.FindRadius(htc.FindHex(activeChar.gameCharacter.position), activeChar.stats.range, false);
+        if(activeChar.characterclass == CharacterClass.HACKER)
+            surrounding.Add(htc.FindHex(activeChar.gameCharacter.position));
         foreach (HexTile ht in surrounding)
             ht.setHighlight(true);
     }
