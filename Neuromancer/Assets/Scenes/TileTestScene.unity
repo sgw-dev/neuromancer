@@ -2996,7 +2996,7 @@ GameObject:
   - component: {fileID: 1371450505}
   m_Layer: 0
   m_Name: MoveDebug
-  m_TagString: Untagged
+  m_TagString: MoveDebug
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4253,6 +4253,9 @@ MonoBehaviour:
   htc: {fileID: 1015876648}
   pointer: {fileID: 1465417649}
   PlayerButtons: {fileID: 1711625369}
+  attackButton: {fileID: 1910589310}
+  attackColor: {r: 0.8784314, g: 0.30980393, b: 0.32156864, a: 1}
+  healColor: {r: 0.3186632, g: 0.8773585, b: 0.37920198, a: 1}
   ButtonCover: {fileID: 713686669}
   EndTurnButton: {fileID: 1986866582}
   CancelButton: {fileID: 972325697}
