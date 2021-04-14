@@ -15,8 +15,11 @@ public class PlayerController : MonoBehaviour
     private bool inSecondarySelect;
     private bool attacking;
     private bool moving;
-
+    [Header("Player Button Objects")]
     public GameObject PlayerButtons;
+    public Button attackButton;
+    public Color attackColor;
+    public Color healColor;
     public GameObject ButtonCover;
     public Button EndTurnButton;
 
@@ -69,7 +72,16 @@ public class PlayerController : MonoBehaviour
                         if (c.gameCharacter.position.Equals(pos))
                         {
                             activeChar = c;
-                            
+                            if(activeChar.characterclass == CharacterClass.PSYONIC)
+                            {
+                                attackButton.GetComponentInChildren<Text>().text = "Heal";
+                                attackButton.image.color = healColor;
+                            }
+                            else
+                            {
+                                attackButton.GetComponentInChildren<Text>().text = "Attack";
+                                attackButton.image.color = attackColor;
+                            }
                             PlayerButtons.SetActive(true);
                             if (activeChar.ActionTakenThisTurn)
                             {

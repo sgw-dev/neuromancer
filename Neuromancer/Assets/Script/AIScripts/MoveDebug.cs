@@ -29,6 +29,7 @@ public class MoveDebug : MonoBehaviour
     }
     public void SetText(HexTile hex, float value)
     {
+        /*
         Vector3 screenPos = Camera.main.WorldToScreenPoint(hex.Position);
         string s = ""+value;
         
@@ -36,7 +37,7 @@ public class MoveDebug : MonoBehaviour
         text.transform.position = screenPos;
         //text.GetComponent<RectTransform>().localPosition = screenPos;
         text.GetComponent<Text>().text = s;
-        texts.Add(text);
+        texts.Add(text);*/
     }
     public void ClearAll()
     {
