@@ -27,6 +27,17 @@ public class MoveDebug : MonoBehaviour
         text.GetComponent<Text>().text = s;
         texts.Add(text);*/
     }
+    public void SetText(HexTile hex, float value)
+    {
+        Vector3 screenPos = Camera.main.WorldToScreenPoint(hex.Position);
+        string s = ""+value;
+        
+        GameObject text = Instantiate(textPrefab, this.gameObject.transform.parent);
+        text.transform.position = screenPos;
+        //text.GetComponent<RectTransform>().localPosition = screenPos;
+        text.GetComponent<Text>().text = s;
+        texts.Add(text);
+    }
     public void ClearAll()
     {
         for(int i = 0; i< texts.Count; i++)

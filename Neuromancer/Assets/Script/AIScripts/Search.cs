@@ -36,6 +36,7 @@ public static class Search
     }
     public static MiniAction DecideAction(GameState gameState, HexTileController htc)
     {
+        MoveDebug md = GameObject.FindGameObjectWithTag("MoveDebug").GetComponent<MoveDebug>();
         int attackRadius = gameState.selfChar.stats.range;
         // **** Spencer Notes ******
         /*  If you can attack, do
@@ -47,13 +48,18 @@ public static class Search
         {
             List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, attackRadius);
             PriorityQueue attackFringe = new PriorityQueue();
+            md.ClearAll();
             foreach (HexTile hex in attackRange)
             {
                 GameState gs = new GameState(gameState.aiChars, gameState.playerChars, hex, gameState.selfChar);
                 float value = EvaluateAOEAttackState(gs, htc);
+                md.SetText(hex, value);
                 //If this attack will do more damage to yourself, don't add it to the list
-                if (value > 0)
+                if (value < -1)
+                {
                     attackFringe.Push((hex, null), value);
+                }
+                    
             }
             //If there is nothing in the list (No good attacks) Move intead
             if (attackFringe.HasNext())
@@ -277,22 +283,28 @@ public static class Search
         float aiHealthLost = 0;
         float playerLost = 0;
         List<HexTile> attackRange = htc.FindRadius(gameState.selfTile, gameState.selfChar.stats.aoeRange);
-        foreach(Character c in gameState.aiChars)
+        attackRange.Add(gameState.selfTile);
+        foreach (HexTile hex in attackRange)
         {
-            if (attackRange.Contains(htc.FindHex(c.gameCharacter.position)))
+            foreach (Character c in gameState.aiChars)
             {
-                aiHealthLost += gameState.selfChar.stats.attackdmg;
-            }
-        }
-        foreach (Character c in gameState.playerChars)
-        {
-            if (attackRange.Contains(htc.FindHex(c.gameCharacter.position)))
-            {
-                playerLost += gameState.selfChar.stats.attackdmg;
-            }
-        }
 
-        return playerLost - aiHealthLost;
+                if (hex.Equals(htc.FindHex(c.gameCharacter.position)))
+                {
+                    aiHealthLost += gameState.selfChar.stats.attackdmg;
+                }
+            }
+            foreach (Character c in gameState.playerChars)
+            {
+                if (hex.Equals(htc.FindHex(c.gameCharacter.position)))
+                {
+                    playerLost += gameState.selfChar.stats.attackdmg;
+                }
+            }
+        }
+            
+
+        return aiHealthLost - playerLost;
         
         
     }
